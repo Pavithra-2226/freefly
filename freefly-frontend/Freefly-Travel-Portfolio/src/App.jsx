@@ -1,4 +1,5 @@
 import { useState,useEffect,useRef } from 'react'
+
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa'
 import aboutHero from './assets/about-hero.png'
 import heroMountain from './assets/hero-mountain.png';
@@ -110,7 +111,7 @@ function Navbar() {
 
         <a
           className="whatsapp"
-          href="https://wa.me/15550188900"
+          href="https://wa.me/8825668075"
           target="_blank"
           rel="noopener noreferrer"
         >
