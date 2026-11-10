@@ -1,5 +1,5 @@
+﻿
 import { useEffect, useState } from "react";
-import { Trash2, RefreshCw, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function AdminEnquiries() {
@@ -8,9 +8,12 @@ function AdminEnquiries() {
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const token = localStorage.getItem("admin_token");
 
+  // FETCH ENQUIRIES
   const fetchEnquiries = async () => {
     try {
       setLoading(true);
@@ -40,6 +43,7 @@ function AdminEnquiries() {
     fetchEnquiries();
   }, []);
 
+  // UPDATE ENQUIRY STATUS
   const updateStatus = async (id, status) => {
     try {
       const response = await fetch(`/api/admin/enquiries/${id}`, {
@@ -68,6 +72,7 @@ function AdminEnquiries() {
     }
   };
 
+  // DELETE ENQUIRY
   const deleteEnquiry = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this enquiry?"
@@ -96,359 +101,454 @@ function AdminEnquiries() {
     }
   };
 
-  const pageStyle = {
-    minHeight: "100vh",
-    background: "#f8fafc",
-    color: "#0f172a",
-    padding: "40px",
-    boxSizing: "border-box",
+  // FILTER ENQUIRIES
+  const filteredEnquiries = enquiries.filter((enquiry) => {
+    const search = searchTerm.toLowerCase();
+
+    const matchesSearch =
+      (enquiry.name || "").toLowerCase().includes(search) ||
+      (enquiry.email || "").toLowerCase().includes(search) ||
+      (enquiry.phone || "").toLowerCase().includes(search) ||
+      (enquiry.destination || "").toLowerCase().includes(search) ||
+      (enquiry.package || "").toLowerCase().includes(search);
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      enquiry.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  // STATISTICS
+  const newCount = enquiries.filter(
+    (item) => item.status === "new"
+  ).length;
+
+  const contactedCount = enquiries.filter(
+    (item) => item.status === "contacted"
+  ).length;
+
+  const closedCount = enquiries.filter(
+    (item) => item.status === "closed"
+  ).length;
+
+  // DATE FORMAT
+  const formatDate = (date) => {
+    if (!date) return "ΓÇö";
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) return "ΓÇö";
+
+    return parsedDate.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
-  const containerStyle = {
-    maxWidth: "1400px",
-    margin: "0 auto",
+  // LOGOUT
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_user");
+    navigate("/admin");
   };
 
   return (
-    <div style={pageStyle}>
-      <div style={containerStyle}>
+    <div className="ff-admin-layout">
 
-        {/* HEADER */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: "32px",
-            gap: "20px",
-          }}
-        >
-          <div>
-            <button
-              onClick={() => navigate("/admin/dashboard")}
-              style={{
-                border: "none",
-                background: "transparent",
-                color: "#64748b",
-                padding: 0,
-                cursor: "pointer",
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                marginBottom: "18px",
-              }}
-            >
-              <ArrowLeft size={16} />
-              Back to Dashboard
-            </button>
+      {/* SIDEBAR - SAME STRUCTURE AS PACKAGES */}
 
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "34px",
-                fontWeight: "700",
-                color: "#0f172a",
-              }}
-            >
-              Enquiries
-            </h1>
+      <aside className="ff-sidebar">
+        <div className="ff-logo">
+          <div className="ff-logo-icon">Γ£ê</div>
+          <span>
+            Freefly<span style={{ color: "#60a5fa" }}>.</span>
+          </span>
+        </div>
 
-            <p
-              style={{
-                margin: "10px 0 0",
-                fontSize: "16px",
-                color: "#64748b",
-              }}
-            >
-              View and manage customer enquiries.
-            </p>
+        <p className="ff-sidebar-label">MAIN MENU</p>
+
+        <nav className="ff-sidebar-nav">
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/dashboard")}
+          >
+            <span>Γûª</span> Dashboard
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/destinations")}
+          >
+            <span>ΓùÄ</span> Destinations
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/packages")}
+          >
+            <span>Γûú</span> Packages
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item active"
+            onClick={() => navigate("/admin/enquiries")}
+          >
+            <span>Γ£ë</span> Enquiries
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/offers")}
+          >
+            <span>Γùç</span> Offers
+          </button>
+        </nav>
+
+        <div className="ff-sidebar-bottom">
+          <div className="ff-sidebar-travel">
+            <span>≡ƒîì</span>
+            <div>
+              <strong>Explore the world</strong>
+              <small>Manage your travel experience</small>
+            </div>
           </div>
 
           <button
             type="button"
-            onClick={fetchEnquiries}
-            disabled={loading}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "10px 18px",
-              background: "#ffffff",
-              color: "#0f172a",
-              border: "1px solid #cbd5e1",
-              borderRadius: "8px",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "14px",
-              fontWeight: "600",
-            }}
+            className="ff-logout"
+            onClick={handleLogout}
           >
-            <RefreshCw size={16} />
-            Refresh
+            Γå¬ <span>Logout</span>
           </button>
         </div>
+      </aside>
 
-        {/* CONTENT CARD */}
-        <div
-          style={{
-            background: "#ffffff",
-            borderRadius: "14px",
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.05)",
-            overflow: "hidden",
-          }}
-        >
-          {loading && (
-            <div
-              style={{
-                padding: "50px",
-                textAlign: "center",
-                color: "#64748b",
-              }}
-            >
-              Loading enquiries...
-            </div>
-          )}
+      {/* MAIN CONTENT */}
 
-          {!loading && error && (
-            <div
-              style={{
-                padding: "50px",
-                textAlign: "center",
-                color: "#dc2626",
-              }}
-            >
-              {error}
-            </div>
-          )}
+      <main className="ff-main">
 
-          {!loading && !error && enquiries.length === 0 && (
-            <div
-              style={{
-                padding: "60px",
-                textAlign: "center",
-                color: "#64748b",
-              }}
-            >
-              <h3
-                style={{
-                  margin: "0 0 8px",
-                  color: "#0f172a",
-                }}
+        {/* TOPBAR - SAME STRUCTURE AS PACKAGES */}
+
+       
+
+        {/* ENQUIRIES CONTENT */}
+
+        <div className="ff-enquiries-content">
+          <div className="ff-enquiries-inner">
+
+            {/* PAGE HEADER */}
+
+            <div className="ff-enquiries-heading">
+              <div>
+                <span className="ff-enquiries-eyebrow">
+                  CUSTOMER MANAGEMENT
+                </span>
+
+                <h1>Manage Enquiries</h1>
+
+                <p>
+                  View customer requests and manage travel enquiries.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="ff-enquiry-refresh"
+                onClick={fetchEnquiries}
+                disabled={loading}
               >
-                No enquiries yet
-              </h3>
-
-              <p style={{ margin: 0 }}>
-                Customer enquiries will appear here.
-              </p>
+                Γå╗ Refresh
+              </button>
             </div>
-          )}
 
-          {!loading && !error && enquiries.length > 0 && (
-            <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  minWidth: "1100px",
-                }}
-              >
-                <thead>
-                  <tr
-                    style={{
-                      background: "#f8fafc",
-                      borderBottom: "1px solid #e2e8f0",
-                    }}
+            {/* STATISTICS */}
+
+            <div className="ff-enquiry-stats">
+
+              <div className="ff-enquiry-stat-card">
+                <div className="ff-enquiry-stat-icon total">
+                  <span>Γûñ</span>
+                </div>
+
+                <div>
+                  <span>Total Enquiries</span>
+                  <h2>{enquiries.length}</h2>
+                </div>
+              </div>
+
+              <div className="ff-enquiry-stat-card">
+                <div className="ff-enquiry-stat-icon new">
+                  <span>Γ£ë</span>
+                </div>
+
+                <div>
+                  <span>New Enquiries</span>
+                  <h2>{newCount}</h2>
+                </div>
+              </div>
+
+              <div className="ff-enquiry-stat-card">
+                <div className="ff-enquiry-stat-icon contacted">
+                  <span>ΓÿÄ</span>
+                </div>
+
+                <div>
+                  <span>Contacted</span>
+                  <h2>{contactedCount}</h2>
+                </div>
+              </div>
+
+              <div className="ff-enquiry-stat-card">
+                <div className="ff-enquiry-stat-icon closed">
+                  <span>Γ£ô</span>
+                </div>
+
+                <div>
+                  <span>Closed</span>
+                  <h2>{closedCount}</h2>
+                </div>
+              </div>
+
+            </div>
+
+            {/* ENQUIRY TABLE CARD */}
+
+            <section className="ff-enquiry-table-card">
+
+              <div className="ff-enquiry-table-header">
+                <div>
+                  <h2>All Enquiries</h2>
+                  <p>View and manage all customer enquiries</p>
+                </div>
+              </div>
+
+              {/* SEARCH AND FILTER */}
+
+              <div className="ff-enquiry-filters">
+
+                <div className="ff-enquiry-search">
+                  <span>Γîò</span>
+
+                  <input
+                    type="text"
+                    placeholder="Search name, email, destination..."
+                    value={searchTerm}
+                    onChange={(e) =>
+                      setSearchTerm(e.target.value)
+                    }
+                  />
+                </div>
+
+                <select
+                  className="ff-enquiry-filter-select"
+                  value={statusFilter}
+                  onChange={(e) =>
+                    setStatusFilter(e.target.value)
+                  }
+                >
+                  <option value="all">All Status</option>
+                  <option value="new">New</option>
+                  <option value="contacted">Contacted</option>
+                  <option value="closed">Closed</option>
+                </select>
+
+              </div>
+
+              {/* LOADING */}
+
+              {loading && (
+                <div className="ff-enquiry-state">
+                  <div className="ff-enquiry-spinner"></div>
+                  <p>Loading enquiries...</p>
+                </div>
+              )}
+
+              {/* ERROR */}
+
+              {!loading && error && (
+                <div className="ff-enquiry-state error">
+                  <p>{error}</p>
+
+                  <button
+                    type="button"
+                    onClick={fetchEnquiries}
                   >
-                    {[
-                      "Customer",
-                      "Contact",
-                      "Destination",
-                      "Package",
-                      "Travel Date",
-                      "Travellers",
-                      "Message",
-                      "Status",
-                      "Received",
-                      "Action",
-                    ].map((heading) => (
-                      <th
-                        key={heading}
-                        style={{
-                          padding: "16px",
-                          textAlign: "left",
-                          fontSize: "13px",
-                          fontWeight: "700",
-                          color: "#475569",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {heading}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
+                    Try Again
+                  </button>
+                </div>
+              )}
 
-                <tbody>
-                  {enquiries.map((enquiry) => (
-                    <tr
-                      key={enquiry.id}
-                      style={{
-                        borderBottom: "1px solid #e2e8f0",
-                      }}
-                    >
-                      <td
-                        style={{
-                          padding: "18px 16px",
-                          fontWeight: "600",
-                          color: "#0f172a",
-                        }}
-                      >
-                        {enquiry.name}
-                      </td>
+              {/* EMPTY */}
 
-                      <td
-                        style={{
-                          padding: "18px 16px",
-                          color: "#475569",
-                        }}
-                      >
-                        <div>{enquiry.email}</div>
-                        <small
-                          style={{
-                            display: "block",
-                            marginTop: "5px",
-                            color: "#64748b",
-                          }}
-                        >
-                          {enquiry.phone}
-                        </small>
-                      </td>
+              {!loading &&
+                !error &&
+                filteredEnquiries.length === 0 && (
+                  <div className="ff-enquiry-state">
+                    <div className="ff-enquiry-empty-icon">
+                      Γ£ë
+                    </div>
 
-                      <td
-                        style={{
-                          padding: "18px 16px",
-                          color: "#475569",
-                        }}
-                      >
-                        {enquiry.destination || "—"}
-                      </td>
+                    <h3>No enquiries found</h3>
 
-                      <td
-                        style={{
-                          padding: "18px 16px",
-                          color: "#475569",
-                        }}
-                      >
-                        {enquiry.package || "—"}
-                      </td>
+                    <p>
+                      No customer enquiries match your search.
+                    </p>
+                  </div>
+                )}
 
-                      <td
-                        style={{
-                          padding: "18px 16px",
-                          color: "#475569",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {enquiry.travel_date || "—"}
-                      </td>
+              {/* TABLE */}
 
-                      <td
-                        style={{
-                          padding: "18px 16px",
-                          color: "#475569",
-                          textAlign: "center",
-                        }}
-                      >
-                        {enquiry.travellers || "—"}
-                      </td>
+              {!loading &&
+                !error &&
+                filteredEnquiries.length > 0 && (
+                  <div className="ff-enquiry-table-wrapper">
+                    <table className="ff-enquiry-table">
 
-                      <td
-                        style={{
-                          padding: "18px 16px",
-                          color: "#475569",
-                          maxWidth: "280px",
-                          lineHeight: "1.5",
-                        }}
-                      >
-                        {enquiry.message || "—"}
-                      </td>
+                      <thead>
+                        <tr>
+                          <th>Customer</th>
+                          <th>Contact Details</th>
+                          <th>Destination</th>
+                          <th>Package</th>
+                          <th>Travel Date</th>
+                          <th>Travellers</th>
+                          <th>Message</th>
+                          <th>Status</th>
+                          <th>Received</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
 
-                      <td style={{ padding: "18px 16px" }}>
-                        <select
-                          value={enquiry.status}
-                          onChange={(event) =>
-                            updateStatus(
-                              enquiry.id,
-                              event.target.value
-                            )
-                          }
-                          style={{
-                            padding: "8px 10px",
-                            borderRadius: "7px",
-                            border: "1px solid #cbd5e1",
-                            background: "#ffffff",
-                            color: "#0f172a",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <option value="new">New</option>
-                          <option value="contacted">
-                            Contacted
-                          </option>
-                          <option value="closed">
-                            Closed
-                          </option>
-                        </select>
-                      </td>
+                      <tbody>
+                        {filteredEnquiries.map((enquiry) => (
+                          <tr key={enquiry.id}>
 
-                      <td
-                        style={{
-                          padding: "18px 16px",
-                          color: "#64748b",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {new Date(
-                          enquiry.created_at
-                        ).toLocaleDateString()}
-                      </td>
+                            <td>
+                              <div className="ff-enquiry-customer">
+                                <div className="ff-enquiry-avatar">
+                                  {(enquiry.name || "C")
+                                    .charAt(0)
+                                    .toUpperCase()}
+                                </div>
 
-                      <td style={{ padding: "18px 16px" }}>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            deleteEnquiry(enquiry.id)
-                          }
-                          title="Delete enquiry"
-                          style={{
-                            width: "36px",
-                            height: "36px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            border: "1px solid #fecaca",
-                            borderRadius: "8px",
-                            background: "#fff",
-                            color: "#dc2626",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <Trash2 size={17} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                                <strong>
+                                  {enquiry.name || "Unknown"}
+                                </strong>
+                              </div>
+                            </td>
+
+                            <td>
+                              <div className="ff-enquiry-contact">
+                                <span>
+                                  Γ£ë {enquiry.email || "ΓÇö"}
+                                </span>
+
+                                <span>
+                                  ΓÿÄ {enquiry.phone || "ΓÇö"}
+                                </span>
+                              </div>
+                            </td>
+
+                            <td>
+                              <span className="ff-enquiry-destination">
+                                {enquiry.destination || "ΓÇö"}
+                              </span>
+                            </td>
+
+                            <td>
+                              {enquiry.package || "ΓÇö"}
+                            </td>
+
+                            <td>
+                              <span className="ff-enquiry-date">
+                                {formatDate(enquiry.travel_date)}
+                              </span>
+                            </td>
+
+                            <td className="ff-enquiry-travellers">
+                              {enquiry.travellers || "ΓÇö"}
+                            </td>
+
+                            <td>
+                              <div
+                                className="ff-enquiry-message"
+                                title={enquiry.message || ""}
+                              >
+                                {enquiry.message || "ΓÇö"}
+                              </div>
+                            </td>
+
+                            <td>
+                              <select
+                                className={`ff-enquiry-status ${
+                                  enquiry.status || "new"
+                                }`}
+                                value={enquiry.status || "new"}
+                                onChange={(e) =>
+                                  updateStatus(
+                                    enquiry.id,
+                                    e.target.value
+                                  )
+                                }
+                              >
+                                <option value="new">New</option>
+                                <option value="contacted">
+                                  Contacted
+                                </option>
+                                <option value="closed">
+                                  Closed
+                                </option>
+                              </select>
+                            </td>
+
+                            <td className="ff-enquiry-received">
+                              {formatDate(enquiry.created_at)}
+                            </td>
+
+                            <td>
+                              <button
+                                type="button"
+                                className="ff-enquiry-delete"
+                                title="Delete enquiry"
+                                onClick={() =>
+                                  deleteEnquiry(enquiry.id)
+                                }
+                              >
+                                ≡ƒùæ
+                              </button>
+                            </td>
+
+                          </tr>
+                        ))}
+                      </tbody>
+
+                    </table>
+                  </div>
+                )}
+
+              {/* FOOTER */}
+
+              <div className="ff-enquiry-footer">
+                Showing {filteredEnquiries.length} of{" "}
+                {enquiries.length} enquiries
+              </div>
+
+            </section>
+
+            <div className="ff-package-footer">
+              Freefly Admin Panel ┬╖ Enquiry Management
             </div>
-          )}
-        </div>
 
-      </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

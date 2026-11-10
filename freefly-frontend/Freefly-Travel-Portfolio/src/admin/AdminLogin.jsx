@@ -1,5 +1,7 @@
+﻿
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../App.css";
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -8,10 +10,10 @@ function AdminLogin() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     setError("");
     setLoading(true);
 
@@ -23,10 +25,7 @@ function AdminLogin() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
+          body: JSON.stringify({ email, password }),
         }
       );
 
@@ -36,16 +35,9 @@ function AdminLogin() {
         throw new Error(data.detail || "Invalid email or password.");
       }
 
-      // Store JWT token
       localStorage.setItem("admin_token", data.access_token);
+      localStorage.setItem("admin_user", JSON.stringify(data.admin));
 
-      // Store admin information
-      localStorage.setItem(
-        "admin_user",
-        JSON.stringify(data.admin)
-      );
-
-      // Go to admin dashboard
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err.message);
@@ -55,113 +47,73 @@ function AdminLogin() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f7fa",
-      }}
-    >
-      <div
-        style={{
-          width: "400px",
-          padding: "40px",
-          background: "#ffffff",
-          borderRadius: "12px",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            marginBottom: "10px",
-          }}
-        >
-          Freefly Admin
-        </h1>
+    <div className="freefly-login-page">
+      <div className="login-overlay"></div>
 
-        <p
-          style={{
-            textAlign: "center",
-            color: "#666",
-            marginBottom: "30px",
-          }}
-        >
-          Sign in to continue
+      <div className="login-content">
+        <div className="login-brand">
+          <div className="brand-icon">Γ£ê</div>
+          <div>
+            <h1>Free<span>fly</span></h1>
+            <p>TOURISM & TRAVELS</p>
+          </div>
+        </div>
+
+        <div className="admin-badge">ADMIN PORTAL</div>
+
+        <h2>Welcome Back</h2>
+        <p className="login-subtitle">
+          Sign in to access the Freefly Admin Panel
         </p>
 
         {error && (
-          <div
-            style={{
-              background: "#ffe5e5",
-              color: "#c00",
-              padding: "10px",
-              borderRadius: "6px",
-              marginBottom: "15px",
-            }}
-          >
-            {error}
-          </div>
+          <div className="login-error">{error}</div>
         )}
 
         <form onSubmit={handleLogin}>
-          <label>Email</label>
+          <div className="login-input-group">
+            <span className="input-icon">Γ£ë</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter admin email"
+              required
+            />
+          </div>
 
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter admin email"
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginTop: "6px",
-              marginBottom: "20px",
-              border: "1px solid #ddd",
-              borderRadius: "6px",
-              boxSizing: "border-box",
-            }}
-          />
-
-          <label>Password</label>
-
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
-            required
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginTop: "6px",
-              marginBottom: "25px",
-              border: "1px solid #ddd",
-              borderRadius: "6px",
-              boxSizing: "border-box",
-            }}
-          />
+          <div className="login-input-group">
+            <span className="input-icon">ΓÖÖ</span>
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
+          </div>
 
           <button
             type="submit"
+            className="login-submit"
             disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px",
-              background: "#111827",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "6px",
-              cursor: loading ? "not-allowed" : "pointer",
-              fontSize: "16px",
-            }}
           >
             {loading ? "Signing in..." : "Login"}
+            {!loading && <span>ΓåÆ</span>}
           </button>
         </form>
+
+        <p className="login-footer">
+          ┬⌐ 2026 Freefly Tourism & Travels
+        </p>
       </div>
     </div>
   );

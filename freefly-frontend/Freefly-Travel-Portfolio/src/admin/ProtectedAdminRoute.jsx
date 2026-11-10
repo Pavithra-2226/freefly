@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 function ProtectedAdminRoute({ children }) {
@@ -9,7 +9,7 @@ function ProtectedAdminRoute({ children }) {
     const verifyAdmin = async () => {
       const token = localStorage.getItem("admin_token");
 
-      // No token → go to login
+      // No token ΓåÆ go to login
       if (!token) {
         setAuthenticated(false);
         setChecking(false);

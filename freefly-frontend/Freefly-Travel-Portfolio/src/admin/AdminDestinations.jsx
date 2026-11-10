@@ -1,13 +1,16 @@
+﻿
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AdminDestinations() {
+  const navigate = useNavigate();
+
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     name: "",
     country: "",
     category: "",
@@ -18,28 +21,22 @@ function AdminDestinations() {
     things_to_do: [],
     gallery: [],
     status: "active",
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
+
+  // =====================================================
+  // RESET FORM
+  // =====================================================
 
   const resetForm = () => {
-    setFormData({
-      name: "",
-      country: "",
-      category: "",
-      description: "",
-      image: "",
-      best_time_to_visit: "",
-      places: [],
-      things_to_do: [],
-      gallery: [],
-      status: "active",
-    });
-
+    setFormData({ ...initialFormData });
     setEditingId(null);
   };
 
-  // =========================================================
+  // =====================================================
   // GET DESTINATIONS
-  // =========================================================
+  // =====================================================
 
   const fetchDestinations = async () => {
     try {
@@ -51,10 +48,7 @@ function AdminDestinations() {
         console.error("Admin token not found.");
         return;
       }
-      console.log("FORM DATA BEFORE SAVE:", formData);
-      console.log("PLACES BEFORE SAVE:", formData.places);
-      console.log("THINGS TO DO BEFORE SAVE:", formData.things_to_do);
-      console.log("GALLERY BEFORE SAVE:", formData.gallery);
+
       const response = await fetch(
         "http://127.0.0.1:8000/api/admin/destinations",
         {
@@ -66,9 +60,6 @@ function AdminDestinations() {
       );
 
       const data = await response.json();
-
-      console.log("Destination API status:", response.status);
-      console.log("Destination API data:", data);
 
       if (!response.ok) {
         throw new Error(
@@ -88,9 +79,9 @@ function AdminDestinations() {
     fetchDestinations();
   }, []);
 
-  // =========================================================
-  // BASIC INPUT CHANGE
-  // =========================================================
+  // =====================================================
+  // INPUT CHANGE
+  // =====================================================
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -101,9 +92,9 @@ function AdminDestinations() {
     }));
   };
 
-  // =========================================================
+  // =====================================================
   // EDIT DESTINATION
-  // =========================================================
+  // =====================================================
 
   const handleEdit = (destination) => {
     setEditingId(destination.id);
@@ -129,18 +120,16 @@ function AdminDestinations() {
     });
   };
 
-  // =========================================================
+  // =====================================================
   // DELETE DESTINATION
-  // =========================================================
+  // =====================================================
 
   const handleDelete = async (destinationId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this destination?"
     );
 
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     try {
       const token = localStorage.getItem("admin_token");
@@ -177,9 +166,9 @@ function AdminDestinations() {
     }
   };
 
-  // =========================================================
+  // =====================================================
   // ENABLE / DISABLE DESTINATION
-  // =========================================================
+  // =====================================================
 
   const handleStatusChange = async (destination) => {
     try {
@@ -230,9 +219,9 @@ function AdminDestinations() {
     }
   };
 
-  // =========================================================
+  // =====================================================
   // TOP PLACES
-  // =========================================================
+  // =====================================================
 
   const addPlace = () => {
     setFormData((previous) => ({
@@ -273,9 +262,9 @@ function AdminDestinations() {
     }));
   };
 
-  // =========================================================
+  // =====================================================
   // THINGS TO DO
-  // =========================================================
+  // =====================================================
 
   const addActivity = () => {
     setFormData((previous) => ({
@@ -316,9 +305,9 @@ function AdminDestinations() {
     }));
   };
 
-  // =========================================================
+  // =====================================================
   // GALLERY
-  // =========================================================
+  // =====================================================
 
   const addGalleryImage = () => {
     setFormData((previous) => ({
@@ -330,7 +319,6 @@ function AdminDestinations() {
   const updateGalleryImage = (index, value) => {
     setFormData((previous) => {
       const updatedGallery = [...previous.gallery];
-
       updatedGallery[index] = value;
 
       return {
@@ -349,9 +337,9 @@ function AdminDestinations() {
     }));
   };
 
-  // =========================================================
+  // =====================================================
   // ADD / UPDATE DESTINATION
-  // =========================================================
+  // =====================================================
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -381,9 +369,6 @@ function AdminDestinations() {
 
       const data = await response.json();
 
-      console.log("Save status:", response.status);
-      console.log("Save response:", data);
-
       if (!response.ok) {
         throw new Error(
           data.detail || "Failed to save destination"
@@ -406,1007 +391,714 @@ function AdminDestinations() {
     }
   };
 
-  // =========================================================
+  // =====================================================
   // CLOSE FORM
-  // =========================================================
+  // =====================================================
 
   const handleCloseForm = () => {
     resetForm();
     setShowForm(false);
   };
 
-  // =========================================================
+  // =====================================================
+  // LOGOUT
+  // =====================================================
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_user");
+    navigate("/admin");
+  };
+
+  // =====================================================
+  // REUSABLE FORM FIELD
+  // =====================================================
+
+  const renderInput = (
+    label,
+    name,
+    placeholder,
+    required = false
+  ) => (
+    <div className="ff-field">
+      <label>{label}</label>
+      <input
+        type="text"
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        placeholder={placeholder}
+        required={required}
+      />
+    </div>
+  );
+
+  const renderTextArea = (
+    label,
+    name,
+    placeholder,
+    rows = 4,
+    required = false
+  ) => (
+    <div className="ff-field">
+      <label>{label}</label>
+      <textarea
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        placeholder={placeholder}
+        rows={rows}
+        required={required}
+      />
+    </div>
+  );
+
+  // =====================================================
   // UI
-  // =========================================================
+  // =====================================================
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f8fafc",
-        padding: "40px",
-        color: "#111827",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1300px",
-          margin: "0 auto",
-        }}
-      >
-        {/* HEADER */}
+    <div className="ff-admin-layout">
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "30px",
-            gap: "20px",
-          }}
-        >
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "30px",
-                fontWeight: "700",
-                color: "#0f172a",
-              }}
-            >
-              Manage Destinations
-            </h1>
+      {/* SIDEBAR */}
 
-            <p
-              style={{
-                margin: "8px 0 0",
-                color: "#64748b",
-                fontSize: "14px",
-              }}
-            >
-              Add, edit, enable, disable, or delete travel
-              destinations.
-            </p>
+      <aside className="ff-sidebar">
+        <div className="ff-logo">
+          <div className="ff-logo-icon">Γ£ê</div>
+          <span>
+            Freefly<span style={{ color: "#60a5fa" }}>.</span>
+          </span>
+        </div>
+
+        <p className="ff-sidebar-label">MAIN MENU</p>
+
+        <nav className="ff-sidebar-nav">
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/dashboard")}
+          >
+            <span>Γûª</span>
+            Dashboard
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item active"
+            onClick={() => navigate("/admin/destinations")}
+          >
+            <span>ΓùÄ</span>
+            Destinations
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/packages")}
+          >
+            <span>Γûú</span>
+            Packages
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/enquiries")}
+          >
+            <span>Γ£ë</span>
+            Enquiries
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/offers")}
+          >
+            <span>Γùç</span>
+            Offers
+          </button>
+        </nav>
+
+        <div className="ff-sidebar-bottom">
+          <div className="ff-sidebar-travel">
+            <span>≡ƒîì</span>
+            <div>
+              <strong>Explore the world</strong>
+              <small>Manage your travel experience</small>
+            </div>
           </div>
 
           <button
-            onClick={() => {
-              if (showForm) {
-                handleCloseForm();
-              } else {
-                resetForm();
-                setShowForm(true);
-              }
-            }}
-            style={primaryButtonStyle}
+            type="button"
+            className="ff-logout"
+            onClick={handleLogout}
           >
-            {showForm ? "Close Form" : "+ Add Destination"}
+            Γå¬ <span>Logout</span>
           </button>
         </div>
+      </aside>
 
-        {/* =====================================================
-            ADD / EDIT FORM
-        ====================================================== */}
+      {/* MAIN CONTENT */}
 
-        {showForm && (
-          <div style={formCardStyle}>
-            <div style={{ marginBottom: "25px" }}>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: "21px",
-                  color: "#0f172a",
+      <main className="ff-main">
+
+        {/* TOPBAR */}
+
+       
+
+        <div className="ff-destinations-content">
+          <div className="ff-destinations-inner">
+
+            {/* PAGE HEADER */}
+
+            <div className="ff-destination-heading">
+              <div>
+                <span className="ff-eyebrow">
+                  TRAVEL CONTENT
+                </span>
+
+                <h1>Manage Destinations</h1>
+
+                <p>
+                  Add, edit, enable, disable, or delete your
+                  travel destinations.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="ff-primary-btn"
+                onClick={() => {
+                  if (showForm) {
+                    handleCloseForm();
+                  } else {
+                    resetForm();
+                    setShowForm(true);
+                  }
                 }}
               >
-                {editingId
-                  ? "Edit Destination"
-                  : "Add Destination"}
-              </h2>
-
-              <p
-                style={{
-                  margin: "6px 0 0",
-                  color: "#64748b",
-                  fontSize: "13px",
-                }}
-              >
-                Add complete destination information for
-                customers.
-              </p>
+                {showForm ? "Γ£ò Close Form" : "+ Add Destination"}
+              </button>
             </div>
 
-            <form onSubmit={handleSubmit}>
-              {/* BASIC INFORMATION */}
+            {/* ADD / EDIT FORM */}
 
-              <div style={sectionTitleStyle}>
-                Basic Information
-              </div>
+            {showForm && (
+              <section className="ff-destination-form-card">
 
-              <div style={twoColumnGrid}>
-                <div>
-                  <label style={labelStyle}>
-                    Destination Name
-                  </label>
-
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Example: Paris"
-                    required
-                    style={inputStyle}
-                  />
-                </div>
-
-                <div>
-                  <label style={labelStyle}>
-                    Country
-                  </label>
-
-                  <input
-                    type="text"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    placeholder="Example: France"
-                    required
-                    style={inputStyle}
-                  />
-                </div>
-
-                <div>
-                  <label style={labelStyle}>
-                    Category
-                  </label>
-
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    required
-                    style={inputStyle}
-                  >
-                    <option value="">
-                      Select Category
-                    </option>
-
-                    <option value="International">
-                      International
-                    </option>
-
-                    <option value="India">
-                      India
-                    </option>
-
-                    <option value="Beach">
-                      Beach
-                    </option>
-
-                    <option value="Adventure">
-                      Adventure
-                    </option>
-
-                    <option value="Honeymoon">
-                      Honeymoon
-                    </option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={labelStyle}>
-                    Status
-                  </label>
-
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    style={inputStyle}
-                  >
-                    <option value="active">
-                      Active
-                    </option>
-
-                    <option value="inactive">
-                      Inactive
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ marginTop: "20px" }}>
-                <label style={labelStyle}>
-                  Main Image URL
-                </label>
-
-                <input
-                  type="text"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="https://example.com/paris.jpg"
-                  required
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={{ marginTop: "20px" }}>
-                <label style={labelStyle}>
-                  Description
-                </label>
-
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Enter destination description"
-                  rows="4"
-                  required
-                  style={{
-                    ...inputStyle,
-                    resize: "vertical",
-                  }}
-                />
-              </div>
-
-              {/* BEST TIME */}
-
-              <div style={sectionStyle}>
-                <div style={sectionHeaderStyle}>
+                <div className="ff-form-heading">
                   <div>
-                    <h3 style={sectionTitleStyle}>
-                      Best Time to Visit
-                    </h3>
+                    <span className="ff-eyebrow">
+                      DESTINATION DETAILS
+                    </span>
 
-                    <p style={sectionDescriptionStyle}>
-                      Example: April - June / September -
-                      October
+                    <h2>
+                      {editingId
+                        ? "Edit Destination"
+                        : "Add New Destination"}
+                    </h2>
+
+                    <p>
+                      Enter the destination information below.
                     </p>
                   </div>
                 </div>
 
-                <input
-                  type="text"
-                  name="best_time_to_visit"
-                  value={formData.best_time_to_visit}
-                  onChange={handleChange}
-                  placeholder="April - June / September - October"
-                  style={inputStyle}
-                />
-              </div>
+                <form onSubmit={handleSubmit}>
 
-              {/* TOP PLACES */}
+                  {/* BASIC INFORMATION */}
 
-              <div style={sectionStyle}>
-                <div style={sectionHeaderStyle}>
-                  <div>
-                    <h3 style={sectionTitleStyle}>
-                      Top Places to Visit
-                    </h3>
-
-                    <p style={sectionDescriptionStyle}>
-                      Add famous places and attractions.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={addPlace}
-                    style={outlineButtonStyle}
-                  >
-                    + Add Place
-                  </button>
-                </div>
-
-                {formData.places.length === 0 ? (
-                  <div style={emptySectionStyle}>
-                    No places added yet.
-                  </div>
-                ) : (
-                  formData.places.map((place, index) => (
-                    <div
-                      key={index}
-                      style={itemCardStyle}
-                    >
-                      <div style={itemHeaderStyle}>
-                        <strong>
-                          Place {index + 1}
-                        </strong>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removePlace(index)
-                          }
-                          style={removeButtonStyle}
-                        >
-                          Remove
-                        </button>
-                      </div>
-
-                      <div style={twoColumnGrid}>
-                        <div>
-                          <label style={labelStyle}>
-                            Place Name
-                          </label>
-
-                          <input
-                            type="text"
-                            value={place.name}
-                            onChange={(event) =>
-                              updatePlace(
-                                index,
-                                "name",
-                                event.target.value
-                              )
-                            }
-                            placeholder="Example: Eiffel Tower"
-                            required
-                            style={inputStyle}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={labelStyle}>
-                            Image URL
-                          </label>
-
-                          <input
-                            type="text"
-                            value={place.image}
-                            onChange={(event) =>
-                              updatePlace(
-                                index,
-                                "image",
-                                event.target.value
-                              )
-                            }
-                            placeholder="https://example.com/eiffel.jpg"
-                            required
-                            style={inputStyle}
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ marginTop: "15px" }}>
-                        <label style={labelStyle}>
-                          Description
-                        </label>
-
-                        <textarea
-                          value={place.description}
-                          onChange={(event) =>
-                            updatePlace(
-                              index,
-                              "description",
-                              event.target.value
-                            )
-                          }
-                          placeholder="Describe this place..."
-                          rows="3"
-                          required
-                          style={{
-                            ...inputStyle,
-                            resize: "vertical",
-                          }}
-                        />
+                  <div className="ff-form-section">
+                    <div className="ff-form-section-heading">
+                      <span>01</span>
+                      <div>
+                        <h3>Basic Information</h3>
+                        <p>Main destination details</p>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
 
-              {/* THINGS TO DO */}
+                    <div className="ff-form-grid">
+                      {renderInput(
+                        "Destination Name",
+                        "name",
+                        "Example: Paris",
+                        true
+                      )}
 
-              <div style={sectionStyle}>
-                <div style={sectionHeaderStyle}>
-                  <div>
-                    <h3 style={sectionTitleStyle}>
-                      Things to Do
-                    </h3>
+                      {renderInput(
+                        "Country",
+                        "country",
+                        "Example: France",
+                        true
+                      )}
 
-                    <p style={sectionDescriptionStyle}>
-                      Add activities and experiences.
-                    </p>
+                      <div className="ff-field">
+                        <label>Category</label>
+                        <select
+                          name="category"
+                          value={formData.category}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select Category</option>
+                          <option value="International">International</option>
+                          <option value="India">India</option>
+                          <option value="Beach">Beach</option>
+                          <option value="Adventure">Adventure</option>
+                          <option value="Honeymoon">Honeymoon</option>
+                        </select>
+                      </div>
+
+                      <div className="ff-field">
+                        <label>Status</label>
+                        <select
+                          name="status"
+                          value={formData.status}
+                          onChange={handleChange}
+                        >
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="ff-form-full-field">
+                      {renderInput(
+                        "Main Image URL",
+                        "image",
+                        "https://example.com/destination.jpg",
+                        true
+                      )}
+                    </div>
+
+                    <div className="ff-form-full-field">
+                      {renderTextArea(
+                        "Description",
+                        "description",
+                        "Enter destination description...",
+                        4,
+                        true
+                      )}
+                    </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={addActivity}
-                    style={outlineButtonStyle}
-                  >
-                    + Add Activity
-                  </button>
-                </div>
+                  {/* BEST TIME */}
 
-                {formData.things_to_do.length === 0 ? (
-                  <div style={emptySectionStyle}>
-                    No activities added yet.
+                  <div className="ff-form-section">
+                    <div className="ff-form-section-heading">
+                      <span>02</span>
+                      <div>
+                        <h3>Best Time to Visit</h3>
+                        <p>Recommended travel season</p>
+                      </div>
+                    </div>
+
+                    {renderInput(
+                      "Best Time to Visit",
+                      "best_time_to_visit",
+                      "Example: April - June / September - October"
+                    )}
                   </div>
-                ) : (
-                  formData.things_to_do.map(
-                    (activity, index) => (
-                      <div
-                        key={index}
-                        style={itemCardStyle}
+
+                  {/* TOP PLACES */}
+
+                  <div className="ff-form-section">
+                    <div className="ff-form-section-heading ff-section-with-action">
+                      <div className="ff-section-title-group">
+                        <span>03</span>
+                        <div>
+                          <h3>Top Places to Visit</h3>
+                          <p>Add famous places and attractions</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="ff-outline-btn"
+                        onClick={addPlace}
                       >
-                        <div style={itemHeaderStyle}>
-                          <strong>
-                            Activity {index + 1}
-                          </strong>
+                        + Add Place
+                      </button>
+                    </div>
+
+                    {formData.places.length === 0 ? (
+                      <div className="ff-empty-section">
+                        No places added yet. Click Add Place to begin.
+                      </div>
+                    ) : (
+                      formData.places.map((place, index) => (
+                        <div className="ff-repeat-card" key={index}>
+                          <div className="ff-repeat-card-heading">
+                            <strong>Place {index + 1}</strong>
+
+                            <button
+                              type="button"
+                              className="ff-remove-btn"
+                              onClick={() => removePlace(index)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+
+                          <div className="ff-form-grid">
+                            <div className="ff-field">
+                              <label>Place Name</label>
+                              <input
+                                type="text"
+                                value={place.name}
+                                onChange={(event) =>
+                                  updatePlace(
+                                    index,
+                                    "name",
+                                    event.target.value
+                                  )
+                                }
+                                placeholder="Example: Eiffel Tower"
+                                required
+                              />
+                            </div>
+
+                            <div className="ff-field">
+                              <label>Image URL</label>
+                              <input
+                                type="text"
+                                value={place.image}
+                                onChange={(event) =>
+                                  updatePlace(
+                                    index,
+                                    "image",
+                                    event.target.value
+                                  )
+                                }
+                                placeholder="https://example.com/place.jpg"
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="ff-form-full-field">
+                            <div className="ff-field">
+                              <label>Description</label>
+                              <textarea
+                                value={place.description}
+                                onChange={(event) =>
+                                  updatePlace(
+                                    index,
+                                    "description",
+                                    event.target.value
+                                  )
+                                }
+                                placeholder="Describe this place..."
+                                rows="3"
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* THINGS TO DO */}
+
+                  <div className="ff-form-section">
+                    <div className="ff-form-section-heading ff-section-with-action">
+                      <div className="ff-section-title-group">
+                        <span>04</span>
+                        <div>
+                          <h3>Things to Do</h3>
+                          <p>Add activities and experiences</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="ff-outline-btn"
+                        onClick={addActivity}
+                      >
+                        + Add Activity
+                      </button>
+                    </div>
+
+                    {formData.things_to_do.length === 0 ? (
+                      <div className="ff-empty-section">
+                        No activities added yet. Click Add Activity to begin.
+                      </div>
+                    ) : (
+                      formData.things_to_do.map((activity, index) => (
+                        <div className="ff-repeat-card" key={index}>
+                          <div className="ff-repeat-card-heading">
+                            <strong>Activity {index + 1}</strong>
+
+                            <button
+                              type="button"
+                              className="ff-remove-btn"
+                              onClick={() => removeActivity(index)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+
+                          <div className="ff-form-grid">
+                            <div className="ff-field">
+                              <label>Activity Name</label>
+                              <input
+                                type="text"
+                                value={activity.name}
+                                onChange={(event) =>
+                                  updateActivity(
+                                    index,
+                                    "name",
+                                    event.target.value
+                                  )
+                                }
+                                placeholder="Example: River Cruise"
+                                required
+                              />
+                            </div>
+
+                            <div className="ff-field">
+                              <label>Image URL</label>
+                              <input
+                                type="text"
+                                value={activity.image}
+                                onChange={(event) =>
+                                  updateActivity(
+                                    index,
+                                    "image",
+                                    event.target.value
+                                  )
+                                }
+                                placeholder="https://example.com/activity.jpg"
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="ff-form-full-field">
+                            <div className="ff-field">
+                              <label>Description</label>
+                              <textarea
+                                value={activity.description}
+                                onChange={(event) =>
+                                  updateActivity(
+                                    index,
+                                    "description",
+                                    event.target.value
+                                  )
+                                }
+                                placeholder="Describe this activity..."
+                                rows="3"
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* GALLERY */}
+
+                  <div className="ff-form-section">
+                    <div className="ff-form-section-heading ff-section-with-action">
+                      <div className="ff-section-title-group">
+                        <span>05</span>
+                        <div>
+                          <h3>Destination Gallery</h3>
+                          <p>Add additional destination images</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="ff-outline-btn"
+                        onClick={addGalleryImage}
+                      >
+                        + Add Gallery Image
+                      </button>
+                    </div>
+
+                    {formData.gallery.length === 0 ? (
+                      <div className="ff-empty-section">
+                        No gallery images added yet.
+                      </div>
+                    ) : (
+                      formData.gallery.map((image, index) => (
+                        <div className="ff-gallery-input-row" key={index}>
+                          <div className="ff-field">
+                            <label>Gallery Image {index + 1}</label>
+                            <input
+                              type="text"
+                              value={image}
+                              onChange={(event) =>
+                                updateGalleryImage(
+                                  index,
+                                  event.target.value
+                                )
+                              }
+                              placeholder="https://example.com/gallery.jpg"
+                              required
+                            />
+                          </div>
 
                           <button
                             type="button"
-                            onClick={() =>
-                              removeActivity(index)
-                            }
-                            style={removeButtonStyle}
+                            className="ff-remove-btn"
+                            onClick={() => removeGalleryImage(index)}
                           >
                             Remove
                           </button>
                         </div>
-
-                        <div style={twoColumnGrid}>
-                          <div>
-                            <label style={labelStyle}>
-                              Activity Name
-                            </label>
-
-                            <input
-                              type="text"
-                              value={activity.name}
-                              onChange={(event) =>
-                                updateActivity(
-                                  index,
-                                  "name",
-                                  event.target.value
-                                )
-                              }
-                              placeholder="Example: Seine River Cruise"
-                              required
-                              style={inputStyle}
-                            />
-                          </div>
-
-                          <div>
-                            <label style={labelStyle}>
-                              Image URL
-                            </label>
-
-                            <input
-                              type="text"
-                              value={activity.image}
-                              onChange={(event) =>
-                                updateActivity(
-                                  index,
-                                  "image",
-                                  event.target.value
-                                )
-                              }
-                              placeholder="https://example.com/cruise.jpg"
-                              required
-                              style={inputStyle}
-                            />
-                          </div>
-                        </div>
-
-                        <div style={{ marginTop: "15px" }}>
-                          <label style={labelStyle}>
-                            Description
-                          </label>
-
-                          <textarea
-                            value={activity.description}
-                            onChange={(event) =>
-                              updateActivity(
-                                index,
-                                "description",
-                                event.target.value
-                              )
-                            }
-                            placeholder="Describe this activity..."
-                            rows="3"
-                            required
-                            style={{
-                              ...inputStyle,
-                              resize: "vertical",
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )
-                  )
-                )}
-              </div>
-
-              {/* GALLERY */}
-
-              <div style={sectionStyle}>
-                <div style={sectionHeaderStyle}>
-                  <div>
-                    <h3 style={sectionTitleStyle}>
-                      Destination Gallery
-                    </h3>
-
-                    <p style={sectionDescriptionStyle}>
-                      Add additional destination images.
-                    </p>
+                      ))
+                    )}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={addGalleryImage}
-                    style={outlineButtonStyle}
-                  >
-                    + Add Gallery Image
-                  </button>
-                </div>
+                  {/* FORM ACTIONS */}
 
-                {formData.gallery.length === 0 ? (
-                  <div style={emptySectionStyle}>
-                    No gallery images added yet.
-                  </div>
-                ) : (
-                  formData.gallery.map((image, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        gap: "10px",
-                        alignItems: "center",
-                        marginBottom: "12px",
-                      }}
+                  <div className="ff-form-actions">
+                    <button
+                      type="button"
+                      className="ff-cancel-btn"
+                      onClick={handleCloseForm}
                     >
-                      <input
-                        type="text"
-                        value={image}
-                        onChange={(event) =>
-                          updateGalleryImage(
-                            index,
-                            event.target.value
-                          )
-                        }
-                        placeholder="https://example.com/paris-gallery.jpg"
-                        required
-                        style={{
-                          ...inputStyle,
-                          flex: 1,
-                        }}
-                      />
+                      Cancel
+                    </button>
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          removeGalleryImage(index)
-                        }
-                        style={removeButtonStyle}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))
-                )}
+                    <button
+                      type="submit"
+                      className="ff-primary-btn"
+                    >
+                      {editingId
+                        ? "Update Destination"
+                        : "Save Destination"}
+                    </button>
+                  </div>
+                </form>
+              </section>
+            )}
+
+            {/* DESTINATION LIST */}
+
+            <div className="ff-destination-list-heading">
+              <div>
+                <h2>All Destinations</h2>
+                <p>
+                  Your destination collection
+                </p>
               </div>
 
-              {/* FORM BUTTONS */}
+              <span className="ff-destination-count">
+                {destinations.length} Destinations
+              </span>
+            </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "10px",
-                  marginTop: "28px",
-                  paddingTop: "22px",
-                  borderTop: "1px solid #e5e7eb",
-                }}
-              >
+            {loading ? (
+              <div className="ff-destination-empty">
+                <div className="ff-loading-spinner"></div>
+                <p>Loading destinations...</p>
+              </div>
+            ) : destinations.length === 0 ? (
+              <div className="ff-destination-empty">
+                <div className="ff-empty-icon">≡ƒîì</div>
+                <h3>No destinations found</h3>
+                <p>Add your first destination to get started.</p>
+
                 <button
                   type="button"
-                  onClick={handleCloseForm}
-                  style={secondaryButtonStyle}
+                  className="ff-primary-btn"
+                  onClick={() => setShowForm(true)}
                 >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  style={primaryButtonStyle}
-                >
-                  {editingId
-                    ? "Update Destination"
-                    : "Save Destination"}
+                  + Add Destination
                 </button>
               </div>
-            </form>
-          </div>
-        )}
-
-        {/* =====================================================
-            DESTINATIONS
-        ====================================================== */}
-
-        {loading ? (
-          <div style={emptyBoxStyle}>
-            <p>Loading destinations...</p>
-          </div>
-        ) : destinations.length === 0 ? (
-          <div style={emptyBoxStyle}>
-            <h3>No destinations found</h3>
-
-            <p>
-              Add your first destination to get started.
-            </p>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(300px, 1fr))",
-              gap: "24px",
-            }}
-          >
-            {destinations.map((destination) => (
-              <div
-                key={destination.id}
-                style={destinationCardStyle}
-              >
-                {/* IMAGE */}
-
-                <div
-                  style={{
-                    position: "relative",
-                    height: "210px",
-                    overflow: "hidden",
-                    background: "#e5e7eb",
-                  }}
-                >
-                  <img
-                    src={destination.image}
-                    alt={destination.name}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
-
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "14px",
-                      right: "14px",
-                      padding: "6px 11px",
-                      borderRadius: "20px",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      background:
-                        destination.status === "active"
-                          ? "#ecfdf3"
-                          : "#fef2f2",
-                      color:
-                        destination.status === "active"
-                          ? "#15803d"
-                          : "#dc2626",
-                    }}
+            ) : (
+              <div className="ff-destination-grid">
+                {destinations.map((destination) => (
+                  <article
+                    className="ff-destination-card"
+                    key={destination.id}
                   >
-                    {destination.status === "active"
-                      ? "● Active"
-                      : "● Inactive"}
-                  </div>
-                </div>
+                    <div className="ff-destination-image">
+                      <img
+                        src={destination.image}
+                        alt={destination.name}
+                      />
 
-                {/* CONTENT */}
-
-                <div
-                  style={{
-                    padding: "20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                  }}
-                >
-                  <h2
-                    style={{
-                      margin: "0 0 8px",
-                      fontSize: "21px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    {destination.name}
-                  </h2>
-
-                  <div
-                    style={{
-                      color: "#64748b",
-                      fontSize: "14px",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    📍 {destination.country}
-                  </div>
-
-                  <div style={{ marginBottom: "14px" }}>
-                    <span style={categoryBadgeStyle}>
-                      {destination.category}
-                    </span>
-                  </div>
-
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "#64748b",
-                      fontSize: "14px",
-                      lineHeight: "1.7",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {destination.description}
-                  </p>
-
-                  <div style={{ flex: 1 }} />
-
-                  <div
-                    style={{
-                      height: "1px",
-                      background: "#e5e7eb",
-                      margin: "20px 0 16px",
-                    }}
-                  />
-
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(3, 1fr)",
-                      gap: "8px",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleEdit(destination)
-                      }
-                      style={{
-                        ...actionButtonStyle,
-                        color: "#2563eb",
-                        borderColor: "#bfdbfe",
-                      }}
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleDelete(destination.id)
-                      }
-                      style={{
-                        ...actionButtonStyle,
-                        color: "#dc2626",
-                        borderColor: "#fecaca",
-                      }}
-                    >
-                      Delete
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleStatusChange(destination)
-                      }
-                      style={{
-                        ...actionButtonStyle,
-                        color:
+                      <span
+                        className={
                           destination.status === "active"
-                            ? "#d97706"
-                            : "#16a34a",
-                        borderColor:
-                          destination.status === "active"
-                            ? "#fde68a"
-                            : "#bbf7d0",
-                      }}
-                    >
-                      {destination.status === "active"
-                        ? "Disable"
-                        : "Enable"}
-                    </button>
-                  </div>
-                </div>
+                            ? "ff-status-badge active"
+                            : "ff-status-badge inactive"
+                        }
+                      >
+                        <span className="ff-status-dot"></span>
+                        {destination.status === "active"
+                          ? "Active"
+                          : "Inactive"}
+                      </span>
+                    </div>
+
+                    <div className="ff-destination-card-body">
+                      <div className="ff-destination-card-top">
+                        <span className="ff-category-badge">
+                          {destination.category}
+                        </span>
+                      </div>
+
+                      <h3>{destination.name}</h3>
+
+                      <p className="ff-destination-country">
+                        <span>≡ƒôì</span>
+                        {destination.country}
+                      </p>
+
+                      <p className="ff-destination-description">
+                        {destination.description}
+                      </p>
+
+                      <div className="ff-destination-card-footer">
+                        <button
+                          type="button"
+                          className="ff-card-edit-btn"
+                          onClick={() => handleEdit(destination)}
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          className="ff-card-delete-btn"
+                          onClick={() => handleDelete(destination.id)}
+                        >
+                          Delete
+                        </button>
+
+                        <button
+                          type="button"
+                          className="ff-card-status-btn"
+                          onClick={() => handleStatusChange(destination)}
+                        >
+                          {destination.status === "active"
+                            ? "Disable"
+                            : "Enable"}
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
               </div>
-            ))}
+            )}
+
+            <div className="ff-destination-footer">
+              Freefly Admin Panel ┬╖ Destination Management
+            </div>
+
           </div>
-        )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
-
-// =========================================================
-// STYLES
-// =========================================================
-
-const labelStyle = {
-  display: "block",
-  fontSize: "13px",
-  fontWeight: "600",
-  color: "#334155",
-  marginBottom: "7px",
-};
-
-const inputStyle = {
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "11px 12px",
-  border: "1px solid #cbd5e1",
-  borderRadius: "8px",
-  fontSize: "14px",
-  outline: "none",
-  background: "#ffffff",
-  color: "#111827",
-};
-
-const twoColumnGrid = {
-  display: "grid",
-  gridTemplateColumns:
-    "repeat(2, minmax(0, 1fr))",
-  gap: "20px",
-};
-
-const formCardStyle = {
-  background: "#ffffff",
-  padding: "28px",
-  borderRadius: "14px",
-  marginBottom: "30px",
-  border: "1px solid #e5e7eb",
-  boxShadow:
-    "0 4px 14px rgba(15, 23, 42, 0.06)",
-};
-
-const sectionStyle = {
-  marginTop: "30px",
-  paddingTop: "25px",
-  borderTop: "1px solid #e5e7eb",
-};
-
-const sectionHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: "20px",
-  marginBottom: "18px",
-};
-
-const sectionTitleStyle = {
-  margin: 0,
-  fontSize: "16px",
-  fontWeight: "700",
-  color: "#0f172a",
-};
-
-const sectionDescriptionStyle = {
-  margin: "5px 0 0",
-  fontSize: "13px",
-  color: "#64748b",
-};
-
-const itemCardStyle = {
-  padding: "18px",
-  border: "1px solid #e2e8f0",
-  borderRadius: "10px",
-  marginBottom: "14px",
-  background: "#f8fafc",
-};
-
-const itemHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "16px",
-  color: "#334155",
-};
-
-const emptySectionStyle = {
-  padding: "20px",
-  textAlign: "center",
-  background: "#f8fafc",
-  borderRadius: "8px",
-  color: "#64748b",
-  fontSize: "13px",
-  border: "1px dashed #cbd5e1",
-};
-
-const outlineButtonStyle = {
-  background: "#ffffff",
-  color: "#0f172a",
-  border: "1px solid #cbd5e1",
-  padding: "9px 14px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "13px",
-  whiteSpace: "nowrap",
-};
-
-const removeButtonStyle = {
-  background: "#ffffff",
-  color: "#dc2626",
-  border: "1px solid #fecaca",
-  padding: "7px 11px",
-  borderRadius: "7px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "12px",
-};
-
-const primaryButtonStyle = {
-  background: "#0f172a",
-  color: "#ffffff",
-  border: "none",
-  padding: "11px 20px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "14px",
-};
-
-const secondaryButtonStyle = {
-  background: "#ffffff",
-  color: "#475569",
-  border: "1px solid #cbd5e1",
-  padding: "11px 20px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "14px",
-};
-
-const actionButtonStyle = {
-  background: "#ffffff",
-  border: "1px solid",
-  padding: "10px 8px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "13px",
-};
-
-const destinationCardStyle = {
-  background: "#ffffff",
-  borderRadius: "16px",
-  overflow: "hidden",
-  border: "1px solid #e5e7eb",
-  boxShadow:
-    "0 4px 14px rgba(15, 23, 42, 0.06)",
-  display: "flex",
-  flexDirection: "column",
-  minHeight: "530px",
-};
-
-const categoryBadgeStyle = {
-  display: "inline-block",
-  padding: "6px 11px",
-  background: "#f8fafc",
-  color: "#475569",
-  borderRadius: "20px",
-  fontSize: "12px",
-  fontWeight: "600",
-  border: "1px solid #e2e8f0",
-};
-
-const emptyBoxStyle = {
-  background: "#ffffff",
-  borderRadius: "12px",
-  padding: "40px",
-  textAlign: "center",
-  border: "1px solid #e5e7eb",
-  color: "#64748b",
-};
 
 export default AdminDestinations;

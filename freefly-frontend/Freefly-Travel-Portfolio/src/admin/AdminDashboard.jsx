@@ -1,4 +1,20 @@
+﻿
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../App.css";
+
+const API = "/api/admin";
+
+function getRecords(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.items)) return data.items;
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data?.destinations)) return data.destinations;
+  if (Array.isArray(data?.packages)) return data.packages;
+  if (Array.isArray(data?.enquiries)) return data.enquiries;
+  if (Array.isArray(data?.offers)) return data.offers;
+  return [];
+}
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -7,388 +23,415 @@ function AdminDashboard() {
     localStorage.getItem("admin_user") || "{}"
   );
 
+  const [stats, setStats] = useState({
+    destinations: 0,
+    packages: 0,
+    enquiries: 0,
+    offers: 0,
+  });
+
+  const [recentEnquiries, setRecentEnquiries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  const menuItems = [
+    { name: "Dashboard", icon: "Γîé", path: "/admin/dashboard" },
+    { name: "Destinations", icon: "Γîû", path: "/admin/destinations" },
+    { name: "Packages", icon: "Γûú", path: "/admin/packages" },
+    { name: "Enquiries", icon: "Γ£ë", path: "/admin/enquiries" },
+    { name: "Offers", icon: "Γùç", path: "/admin/offers" },
+  ];
+
+  const fetchDashboardData = async () => {
+    const token = localStorage.getItem("admin_token");
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const endpoints = [
+      { key: "destinations", url: `${API}/destinations` },
+      { key: "packages", url: `${API}/packages` },
+      { key: "enquiries", url: `${API}/enquiries` },
+      { key: "offers", url: `${API}/offers` },
+    ];
+
+    try {
+      const results = await Promise.allSettled(
+        endpoints.map(async (endpoint) => {
+          const response = await fetch(endpoint.url, { headers });
+
+          if (!response.ok) {
+            throw new Error(`Unable to fetch ${endpoint.key}`);
+          }
+
+          const data = await response.json();
+          return {
+            key: endpoint.key,
+            records: getRecords(data),
+          };
+        })
+      );
+
+      const updatedStats = {
+        destinations: 0,
+        packages: 0,
+        enquiries: 0,
+        offers: 0,
+      };
+
+      let enquiries = [];
+
+      results.forEach((result) => {
+        if (result.status !== "fulfilled") return;
+
+        const { key, records } = result.value;
+        updatedStats[key] = records.length;
+
+        if (key === "enquiries") {
+          enquiries = records;
+        }
+      });
+
+      setStats(updatedStats);
+
+      enquiries.sort((a, b) => {
+        const dateA = new Date(
+          a.created_at || a.createdAt || 0
+        ).getTime();
+
+        const dateB = new Date(
+          b.created_at || b.createdAt || 0
+        ).getTime();
+
+        return dateB - dateA;
+      });
+
+      setRecentEnquiries(enquiries.slice(0, 5));
+    } catch (error) {
+      console.error("Dashboard data error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
     localStorage.removeItem("admin_user");
     navigate("/admin");
   };
 
-  const cardStyle = {
-    background: "#ffffff",
-    padding: "28px",
-    borderRadius: "14px",
-    border: "1px solid #e2e8f0",
-    boxShadow: "0 4px 12px rgba(15, 23, 42, 0.06)",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
+  const formatTime = (dateValue) => {
+    if (!dateValue) return "Recently";
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) return "Recently";
+
+    const difference = Math.max(0, Date.now() - date.getTime());
+    const minutes = Math.floor(difference / 60000);
+
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return `${minutes} mins ago`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hours ago`;
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} days ago`;
+
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+    });
   };
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f8fafc",
-        color: "#0f172a",
-        padding: "40px",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        {/* HEADER */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: "40px",
-          }}
-        >
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "34px",
-                fontWeight: "700",
-                color: "#0f172a",
-              }}
-            >
-              Dashboard
-            </h1>
+  const getCustomerName = (item) =>
+    item.name || item.customer_name || item.full_name || "Customer";
 
-            <p
-              style={{
-                marginTop: "10px",
-                marginBottom: 0,
-                fontSize: "16px",
-                color: "#64748b",
-              }}
+  const getEnquiryDestination = (item) =>
+    item.destination || item.package || item.subject || "Travel enquiry";
+
+  const filteredEnquiries = recentEnquiries.filter((item) => {
+    const query = search.toLowerCase();
+
+    return (
+      getCustomerName(item).toLowerCase().includes(query) ||
+      getEnquiryDestination(item).toLowerCase().includes(query) ||
+      (item.email || "").toLowerCase().includes(query)
+    );
+  });
+
+  const statCards = [
+    {
+      title: "Destinations",
+      value: stats.destinations,
+      icon: "Γûú",
+      color: "blue",
+      growth: "Travel locations",
+    },
+    {
+      title: "Packages",
+      value: stats.packages,
+      icon: "Γùº",
+      color: "purple",
+      growth: "Travel packages",
+    },
+    {
+      title: "Enquiries",
+      value: stats.enquiries,
+      icon: "Γ£ë",
+      color: "orange",
+      growth: "Customer requests",
+    },
+    {
+      title: "Offers",
+      value: stats.offers,
+      icon: "Γùç",
+      color: "green",
+      growth: "Special offers",
+    },
+  ];
+
+  const quickActions = [
+    {
+      title: "Add Destination",
+      icon: "≡ƒôì",
+      color: "blue",
+      path: "/admin/destinations",
+    },
+    {
+      title: "Add Package",
+      icon: "≡ƒº│",
+      color: "purple",
+      path: "/admin/packages",
+    },
+    {
+      title: "View Enquiries",
+      icon: "Γ£ë∩╕Å",
+      color: "orange",
+      path: "/admin/enquiries",
+    },
+    {
+      title: "Create Offer",
+      icon: "≡ƒÅ╖∩╕Å",
+      color: "green",
+      path: "/admin/offers",
+    },
+  ];
+
+  return (
+    <div className="ff-admin-layout ff-new-dashboard">
+
+      {/* SIDEBAR */}
+      <aside className="ff-sidebar ff-dashboard-sidebar">
+
+        <div className="ff-logo ff-dashboard-logo">
+          <div className="ff-logo-icon">Γ£ê</div>
+          <div>
+            <h2>Free<span>fly</span></h2>
+            <p>TOURISM & TRAVELS</p>
+          </div>
+        </div>
+
+        <p className="ff-sidebar-label">ADMIN PANEL</p>
+
+        <nav className="ff-sidebar-nav">
+          {menuItems.map((item, index) => (
+            <button
+              key={item.name}
+              type="button"
+              className={`ff-nav-item ${index === 0 ? "active" : ""}`}
+              onClick={() => navigate(item.path)}
             >
-              Welcome back, {adminUser.name || "Admin"}. Manage your
-              travel website from here.
-            </p>
+              <span>{item.icon}</span>
+              {item.name}
+            </button>
+          ))}
+        </nav>
+
+        <div className="ff-dashboard-sidebar-bottom">
+          <div className="ff-sidebar-travel">
+            <span>Γ£ê</span>
+            <p>Explore the world with Freefly.</p>
           </div>
 
           <button
+            type="button"
+            className="ff-logout"
             onClick={handleLogout}
-            style={{
-              padding: "10px 20px",
-              background: "#ffffff",
-              color: "#0f172a",
-              border: "1px solid #cbd5e1",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: "600",
-            }}
           >
-            Logout
+            ΓçÑ Logout
           </button>
         </div>
+      </aside>
 
-        {/* DASHBOARD CARDS */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(4, minmax(0, 1fr))",
-            gap: "22px",
-          }}
-        >
-          {/* DESTINATIONS */}
-          <div
-            onClick={() => navigate("/admin/destinations")}
-            style={cardStyle}
-          >
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "12px",
-                background: "#f1f5f9",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: "22px",
-                fontSize: "22px",
-              }}
-            >
-              📍
-            </div>
+      {/* MAIN AREA */}
+      <main className="ff-main ff-dashboard-main">
 
-            <h2
-              style={{
-                margin: "0 0 10px",
-                fontSize: "20px",
-                fontWeight: "700",
-              }}
-            >
-              Destinations
-            </h2>
+        {/* TOPBAR */}
+        <header className="ff-dashboard-topbar">
 
-            <p
-              style={{
-                margin: 0,
-                color: "#64748b",
-                fontSize: "14px",
-                lineHeight: "1.6",
-              }}
-            >
-              Manage travel destinations
-            </p>
-
-            <div
-              style={{
-                marginTop: "24px",
-                color: "#1d4ed8",
-                fontSize: "14px",
-                fontWeight: "600",
-              }}
-            >
-              Manage →
-            </div>
+          <div className="ff-dashboard-search">
+            <span>Γîò</span>
+            <input
+              type="search"
+              placeholder="Search customers or destinations..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
 
-          {/* PACKAGES */}
-          <div
-            onClick={() => navigate("/admin/packages")}
-            style={cardStyle}
-          >
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "12px",
-                background: "#f1f5f9",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: "22px",
-                fontSize: "22px",
-              }}
-            >
-              🧳
+          <div className="ff-dashboard-top-profile">
+            <div className="ff-dashboard-notification">ΓÖº</div>
+
+            <div className="ff-dashboard-profile-avatar">
+              {(adminUser.name || "A").charAt(0).toUpperCase()}
             </div>
 
-            <h2
-              style={{
-                margin: "0 0 10px",
-                fontSize: "20px",
-                fontWeight: "700",
-              }}
-            >
-              Packages
-            </h2>
-
-            <p
-              style={{
-                margin: 0,
-                color: "#64748b",
-                fontSize: "14px",
-                lineHeight: "1.6",
-              }}
-            >
-              Manage travel packages
-            </p>
-
-            <div
-              style={{
-                marginTop: "24px",
-                color: "#1d4ed8",
-                fontSize: "14px",
-                fontWeight: "600",
-              }}
-            >
-              Manage →
+            <div className="ff-dashboard-profile-info">
+              <strong>{adminUser.name || "Admin"}</strong>
+              <span>Administrator</span>
             </div>
           </div>
+        </header>
 
-          {/* ENQUIRIES */}
-          <div
-            onClick={() => navigate("/admin/enquiries")}
-            style={cardStyle}
-          >
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "12px",
-                background: "#f1f5f9",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: "22px",
-                fontSize: "22px",
-              }}
-            >
-              ✉️
+        <div className="ff-dashboard-content">
+
+          {/* WELCOME BANNER */}
+          <section className="ff-modern-banner">
+            <div className="ff-modern-banner-content">
+              <span>YOUR TRAVEL CONTROL CENTER</span>
+              <h1>
+                Welcome Back, {adminUser.name || "Admin"}! ≡ƒæï
+              </h1>
+              <p>
+                Manage your travel website and create unforgettable journeys.
+              </p>
             </div>
 
-            <h2
-              style={{
-                margin: "0 0 10px",
-                fontSize: "20px",
-                fontWeight: "700",
-              }}
-            >
-              Enquiries
-            </h2>
+            <div className="ff-modern-banner-plane">Γ£ê</div>
+          </section>
 
-            <p
-              style={{
-                margin: 0,
-                color: "#64748b",
-                fontSize: "14px",
-                lineHeight: "1.6",
-              }}
-            >
-              View customer enquiries
-            </p>
+          {/* STATISTICS */}
+          <section className="ff-modern-stats">
+            {statCards.map((card) => (
+              <div
+                className="ff-modern-stat-card"
+                key={card.title}
+              >
+                <div className={`ff-modern-stat-icon ${card.color}`}>
+                  {card.icon}
+                </div>
 
-            <div
-              style={{
-                marginTop: "24px",
-                color: "#1d4ed8",
-                fontSize: "14px",
-                fontWeight: "600",
-              }}
-            >
-              Manage →
-            </div>
-          </div>
+                <div className="ff-modern-stat-info">
+                  <h2>{loading ? "ΓÇö" : card.value}</h2>
+                  <p>{card.title}</p>
+                  <span>{card.growth}</span>
+                </div>
+              </div>
+            ))}
+          </section>
 
-          {/* OFFERS */}
-          <div
-            onClick={() => navigate("/admin/offers")}
-            style={cardStyle}
-          >
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "12px",
-                background: "#f1f5f9",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: "22px",
-                fontSize: "22px",
-              }}
-            >
-              🏷️
+          {/* QUICK ACTIONS + RECENT ENQUIRIES */}
+          <section className="ff-dashboard-bottom-grid">
+
+            {/* QUICK ACTIONS */}
+            <div className="ff-modern-quick-panel">
+              <div className="ff-modern-panel-heading">
+                <div>
+                  <h2><span>╧ƒ</span> Quick Actions</h2>
+                  <p>Quickly access your main management areas.</p>
+                </div>
+              </div>
+
+              <div className="ff-modern-quick-grid">
+                {quickActions.map((action) => (
+                  <button
+                    type="button"
+                    key={action.title}
+                    className={`ff-modern-quick-card ${action.color}`}
+                    onClick={() => navigate(action.path)}
+                  >
+                    <span className="ff-modern-quick-icon">
+                      {action.icon}
+                    </span>
+                    <strong>{action.title}</strong>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <h2
-              style={{
-                margin: "0 0 10px",
-                fontSize: "20px",
-                fontWeight: "700",
-              }}
-            >
-              Offers
-            </h2>
+            {/* RECENT ENQUIRIES */}
+            <div className="ff-modern-enquiry-panel">
 
-            <p
-              style={{
-                margin: 0,
-                color: "#64748b",
-                fontSize: "14px",
-                lineHeight: "1.6",
-              }}
-            >
-              Manage special offers
-            </p>
+              <div className="ff-modern-panel-heading enquiry-heading">
+                <div>
+                  <h2><span>Γÿ╖</span> Recent Enquiries</h2>
+                </div>
 
-            <div
-              style={{
-                marginTop: "24px",
-                color: "#1d4ed8",
-                fontSize: "14px",
-                fontWeight: "600",
-              }}
-            >
-              Manage →
+                <button
+                  type="button"
+                  onClick={() => navigate("/admin/enquiries")}
+                >
+                  View All ΓåÆ
+                </button>
+              </div>
+
+              {loading ? (
+                <div className="ff-modern-enquiry-empty">
+                  Loading enquiries...
+                </div>
+              ) : filteredEnquiries.length === 0 ? (
+                <div className="ff-modern-enquiry-empty">
+                  <span>Γ£ë</span>
+                  <p>No recent enquiries found.</p>
+                </div>
+              ) : (
+                <div className="ff-modern-enquiry-list">
+                  {filteredEnquiries.map((item, index) => (
+                    <div
+                      className="ff-modern-enquiry-item"
+                      key={item.id || item._id || index}
+                    >
+                      <div className="ff-modern-customer-avatar">
+                        {getCustomerName(item).charAt(0).toUpperCase()}
+                      </div>
+
+                      <div className="ff-modern-customer-info">
+                        <strong>{getCustomerName(item)}</strong>
+                        <span>{getEnquiryDestination(item)}</span>
+                      </div>
+
+                      <div className="ff-modern-enquiry-time">
+                        <span>
+                          {formatTime(
+                            item.created_at || item.createdAt
+                          )}
+                        </span>
+                        <i></i>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
+
+          </section>
+
+          {/* FOOTER */}
+          <footer className="ff-dashboard-footer">
+            ┬⌐ 2026 Freefly Tourism & Travels. All rights reserved.
+          </footer>
+
         </div>
-
-        {/* QUICK ACTIONS */}
-        <div
-          style={{
-            marginTop: "32px",
-            background: "#ffffff",
-            padding: "28px",
-            borderRadius: "14px",
-            border: "1px solid #e2e8f0",
-            boxShadow: "0 4px 12px rgba(15, 23, 42, 0.05)",
-          }}
-        >
-          <h2
-            style={{
-              margin: "0 0 8px",
-              fontSize: "20px",
-            }}
-          >
-            Quick Actions
-          </h2>
-
-          <p
-            style={{
-              margin: "0 0 22px",
-              color: "#64748b",
-              fontSize: "14px",
-            }}
-          >
-            Quickly access the main content management areas.
-          </p>
-
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              flexWrap: "wrap",
-            }}
-          >
-            <button
-              onClick={() => navigate("/admin/destinations")}
-              style={quickButtonStyle}
-            >
-              + Add Destination
-            </button>
-
-            <button
-              onClick={() => navigate("/admin/packages")}
-              style={quickButtonStyle}
-            >
-              Manage Packages
-            </button>
-
-            <button
-              onClick={() => navigate("/admin/enquiries")}
-              style={quickButtonStyle}
-            >
-              View Enquiries
-            </button>
-          </div>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }
-
-const quickButtonStyle = {
-  padding: "11px 18px",
-  background: "#ffffff",
-  color: "#0f172a",
-  border: "1px solid #cbd5e1",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontSize: "14px",
-  fontWeight: "600",
-};
 
 export default AdminDashboard;

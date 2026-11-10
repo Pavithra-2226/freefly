@@ -1,52 +1,42 @@
+﻿
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const initialFormData = {
+  title: "",
+  destination: "",
+  duration: "",
+  price: "",
+  description: "",
+  image: "",
+  tag: "",
+  status: "active",
+  inclusions: [],
+  exclusions: [],
+  itinerary: [],
+};
 
 function AdminPackages() {
+  const navigate = useNavigate();
+
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState(initialFormData);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    destination: "",
-    duration: "",
-    price: "",
-    description: "",
-    image: "",
-    tag: "",
-    status: "active",
-    inclusions: [],
-    exclusions: [],
-    itinerary: [],
-  });
-
-  // =========================================================
   // RESET FORM
-  // =========================================================
-
   const resetForm = () => {
     setFormData({
-      title: "",
-      destination: "",
-      duration: "",
-      price: "",
-      description: "",
-      image: "",
-      tag: "",
-      status: "active",
+      ...initialFormData,
       inclusions: [],
       exclusions: [],
       itinerary: [],
     });
-
     setEditingId(null);
   };
 
-  // =========================================================
   // GET PACKAGES
-  // =========================================================
-
   const fetchPackages = async () => {
     try {
       setLoading(true);
@@ -70,13 +60,8 @@ function AdminPackages() {
 
       const data = await response.json();
 
-      console.log("Package API status:", response.status);
-      console.log("Package API data:", data);
-
       if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to load packages"
-        );
+        throw new Error(data.detail || "Failed to load packages");
       }
 
       setPackages(data);
@@ -91,10 +76,7 @@ function AdminPackages() {
     fetchPackages();
   }, []);
 
-  // =========================================================
   // BASIC INPUT CHANGE
-  // =========================================================
-
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -104,10 +86,7 @@ function AdminPackages() {
     }));
   };
 
-  // =========================================================
   // EDIT PACKAGE
-  // =========================================================
-
   const handleEdit = (packageItem) => {
     setEditingId(packageItem.id);
 
@@ -133,18 +112,13 @@ function AdminPackages() {
     });
   };
 
-  // =========================================================
   // DELETE PACKAGE
-  // =========================================================
-
   const handleDelete = async (packageId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this package?"
     );
 
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     try {
       const token = localStorage.getItem("admin_token");
@@ -167,13 +141,10 @@ function AdminPackages() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to delete package"
-        );
+        throw new Error(data.detail || "Failed to delete package");
       }
 
       alert("Package deleted successfully!");
-
       await fetchPackages();
     } catch (error) {
       console.error("Delete package error:", error);
@@ -181,10 +152,7 @@ function AdminPackages() {
     }
   };
 
-  // =========================================================
   // ENABLE / DISABLE PACKAGE
-  // =========================================================
-
   const handleStatusChange = async (packageItem) => {
     try {
       const token = localStorage.getItem("admin_token");
@@ -195,9 +163,7 @@ function AdminPackages() {
       }
 
       const newStatus =
-        packageItem.status === "active"
-          ? "inactive"
-          : "active";
+        packageItem.status === "active" ? "inactive" : "active";
 
       const response = await fetch(
         `http://127.0.0.1:8000/api/admin/packages/${packageItem.id}`,
@@ -234,10 +200,7 @@ function AdminPackages() {
     }
   };
 
-  // =========================================================
   // INCLUSIONS
-  // =========================================================
-
   const addInclusion = () => {
     setFormData((previous) => ({
       ...previous,
@@ -248,7 +211,6 @@ function AdminPackages() {
   const updateInclusion = (index, value) => {
     setFormData((previous) => {
       const updated = [...previous.inclusions];
-
       updated[index] = value;
 
       return {
@@ -267,10 +229,7 @@ function AdminPackages() {
     }));
   };
 
-  // =========================================================
   // EXCLUSIONS
-  // =========================================================
-
   const addExclusion = () => {
     setFormData((previous) => ({
       ...previous,
@@ -281,7 +240,6 @@ function AdminPackages() {
   const updateExclusion = (index, value) => {
     setFormData((previous) => {
       const updated = [...previous.exclusions];
-
       updated[index] = value;
 
       return {
@@ -300,10 +258,7 @@ function AdminPackages() {
     }));
   };
 
-  // =========================================================
   // ITINERARY
-  // =========================================================
-
   const addItineraryDay = () => {
     setFormData((previous) => ({
       ...previous,
@@ -314,7 +269,6 @@ function AdminPackages() {
   const updateItineraryDay = (index, value) => {
     setFormData((previous) => {
       const updated = [...previous.itinerary];
-
       updated[index] = value;
 
       return {
@@ -333,10 +287,7 @@ function AdminPackages() {
     }));
   };
 
-  // =========================================================
   // ADD / UPDATE PACKAGE
-  // =========================================================
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -365,13 +316,8 @@ function AdminPackages() {
 
       const data = await response.json();
 
-      console.log("Save package status:", response.status);
-      console.log("Save package response:", data);
-
       if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to save package"
-        );
+        throw new Error(data.detail || "Failed to save package");
       }
 
       alert(
@@ -390,917 +336,540 @@ function AdminPackages() {
     }
   };
 
-  // =========================================================
   // CLOSE FORM
-  // =========================================================
-
   const handleCloseForm = () => {
     resetForm();
     setShowForm(false);
   };
 
-  // =========================================================
-  // UI
-  // =========================================================
+  // LOGOUT
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_user");
+    navigate("/admin");
+  };
+
+  // REUSABLE INPUT
+  const renderInput = (label, name, placeholder, required = false) => (
+    <div className="ff-package-field">
+      <label>{label}</label>
+      <input
+        type="text"
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+        placeholder={placeholder}
+        required={required}
+      />
+    </div>
+  );
+
+  // REUSABLE ARRAY INPUT
+  const renderArrayItems = (items, updateItem, removeItem, placeholder, label) => (
+    <div className="ff-package-array">
+      {items.length === 0 ? (
+        <div className="ff-package-empty-section">
+          No {label.toLowerCase()} added yet.
+        </div>
+      ) : (
+        items.map((item, index) => (
+          <div className="ff-package-array-row" key={index}>
+            <input
+              type="text"
+              value={item}
+              onChange={(event) => updateItem(index, event.target.value)}
+              placeholder={placeholder}
+              required
+            />
+            <button
+              type="button"
+              className="ff-package-remove-btn"
+              onClick={() => removeItem(index)}
+            >
+              Remove
+            </button>
+          </div>
+        ))
+      )}
+    </div>
+  );
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f8fafc",
-        padding: "40px",
-        color: "#111827",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "1300px",
-          margin: "0 auto",
-        }}
-      >
-        {/* HEADER */}
+    <div className="ff-admin-layout">
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "30px",
-            gap: "20px",
-          }}
-        >
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "30px",
-                fontWeight: "700",
-                color: "#0f172a",
-              }}
-            >
-              Manage Packages
-            </h1>
+      {/* SIDEBAR */}
 
-            <p
-              style={{
-                margin: "8px 0 0",
-                color: "#64748b",
-                fontSize: "14px",
-              }}
-            >
-              Add, edit, enable, disable, or delete travel
-              packages.
-            </p>
+      <aside className="ff-sidebar">
+        <div className="ff-logo">
+          <div className="ff-logo-icon">Γ£ê</div>
+          <span>
+            Freefly<span style={{ color: "#60a5fa" }}>.</span>
+          </span>
+        </div>
+
+        <p className="ff-sidebar-label">MAIN MENU</p>
+
+        <nav className="ff-sidebar-nav">
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/dashboard")}
+          >
+            <span>Γûª</span> Dashboard
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/destinations")}
+          >
+            <span>ΓùÄ</span> Destinations
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item active"
+            onClick={() => navigate("/admin/packages")}
+          >
+            <span>Γûú</span> Packages
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/enquiries")}
+          >
+            <span>Γ£ë</span> Enquiries
+          </button>
+
+          <button
+            type="button"
+            className="ff-nav-item"
+            onClick={() => navigate("/admin/offers")}
+          >
+            <span>Γùç</span> Offers
+          </button>
+        </nav>
+
+        <div className="ff-sidebar-bottom">
+          <div className="ff-sidebar-travel">
+            <span>≡ƒîì</span>
+            <div>
+              <strong>Explore the world</strong>
+              <small>Manage your travel experience</small>
+            </div>
           </div>
 
           <button
-            onClick={() => {
-              if (showForm) {
-                handleCloseForm();
-              } else {
-                resetForm();
-                setShowForm(true);
-              }
-            }}
-            style={primaryButtonStyle}
+            type="button"
+            className="ff-logout"
+            onClick={handleLogout}
           >
-            {showForm ? "Close Form" : "+ Add Package"}
+            Γå¬ <span>Logout</span>
           </button>
         </div>
+      </aside>
 
-        {/* ADD / EDIT FORM */}
+      {/* MAIN CONTENT */}
 
-        {showForm && (
-          <div style={formCardStyle}>
-            <div style={{ marginBottom: "25px" }}>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: "21px",
-                  color: "#0f172a",
+      <main className="ff-main">
+
+        {/* TOPBAR */}
+
+       
+
+        <div className="ff-packages-content">
+          <div className="ff-packages-inner">
+
+            {/* PAGE HEADER */}
+
+            <div className="ff-packages-heading">
+              <div>
+                <span className="ff-packages-eyebrow">
+                  TRAVEL CONTENT
+                </span>
+                <h1>Manage Packages</h1>
+                <p>
+                  Create, update, and manage your travel packages.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="ff-package-primary-btn"
+                onClick={() => {
+                  if (showForm) {
+                    handleCloseForm();
+                  } else {
+                    resetForm();
+                    setShowForm(true);
+                  }
                 }}
               >
-                {editingId ? "Edit Package" : "Add Package"}
-              </h2>
-
-              <p
-                style={{
-                  margin: "6px 0 0",
-                  color: "#64748b",
-                  fontSize: "13px",
-                }}
-              >
-                Add complete package information for
-                customers.
-              </p>
+                {showForm ? "Γ£ò Close Form" : "+ Add Package"}
+              </button>
             </div>
 
-            <form onSubmit={handleSubmit}>
-              {/* BASIC INFORMATION */}
+            {/* ADD / EDIT FORM */}
 
-              <div style={sectionTitleStyle}>
-                Basic Information
-              </div>
-
-              <div style={twoColumnGrid}>
-                <div>
-                  <label style={labelStyle}>
-                    Package Title
-                  </label>
-
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    placeholder="Example: Bali Escape"
-                    required
-                    style={inputStyle}
-                  />
+            {showForm && (
+              <section className="ff-package-form-card">
+                <div className="ff-package-form-heading">
+                  <span className="ff-packages-eyebrow">
+                    PACKAGE DETAILS
+                  </span>
+                  <h2>
+                    {editingId ? "Edit Package" : "Add New Package"}
+                  </h2>
+                  <p>
+                    Enter the travel package information below.
+                  </p>
                 </div>
 
-                <div>
-                  <label style={labelStyle}>
-                    Destination
-                  </label>
+                <form onSubmit={handleSubmit}>
 
-                  <input
-                    type="text"
-                    name="destination"
-                    value={formData.destination}
-                    onChange={handleChange}
-                    placeholder="Example: Bali"
-                    required
-                    style={inputStyle}
-                  />
-                </div>
+                  {/* BASIC INFORMATION */}
 
-                <div>
-                  <label style={labelStyle}>
-                    Duration
-                  </label>
+                  <div className="ff-package-form-section">
+                    <div className="ff-package-section-heading">
+                      <span>01</span>
+                      <div>
+                        <h3>Basic Information</h3>
+                        <p>Package title, destination and pricing</p>
+                      </div>
+                    </div>
 
-                  <input
-                    type="text"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    placeholder="Example: 4 Days / 3 Nights"
-                    required
-                    style={inputStyle}
-                  />
-                </div>
+                    <div className="ff-package-form-grid">
+                      {renderInput(
+                        "Package Title",
+                        "title",
+                        "Example: Bali Escape",
+                        true
+                      )}
 
-                <div>
-                  <label style={labelStyle}>
-                    Price
-                  </label>
+                      {renderInput(
+                        "Destination",
+                        "destination",
+                        "Example: Bali",
+                        true
+                      )}
 
-                  <input
-                    type="text"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="Example: From ₹45,000"
-                    required
-                    style={inputStyle}
-                  />
-                </div>
+                      {renderInput(
+                        "Duration",
+                        "duration",
+                        "Example: 4 Days / 3 Nights",
+                        true
+                      )}
 
-                <div>
-                  <label style={labelStyle}>
-                    Package Tag
-                  </label>
+                      {renderInput(
+                        "Price",
+                        "price",
+                        "Example: From Γé╣45,000",
+                        true
+                      )}
 
-                  <input
-                    type="text"
-                    name="tag"
-                    value={formData.tag}
-                    onChange={handleChange}
-                    placeholder="Example: Most loved"
-                    style={inputStyle}
-                  />
-                </div>
+                      {renderInput(
+                        "Package Tag",
+                        "tag",
+                        "Example: Most Loved"
+                      )}
 
-                <div>
-                  <label style={labelStyle}>
-                    Status
-                  </label>
+                      <div className="ff-package-field">
+                        <label>Status</label>
+                        <select
+                          name="status"
+                          value={formData.status}
+                          onChange={handleChange}
+                        >
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                        </select>
+                      </div>
+                    </div>
 
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    style={inputStyle}
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-              </div>
+                    <div className="ff-package-full-field">
+                      {renderInput(
+                        "Main Image URL",
+                        "image",
+                        "/travel/bali.jpg",
+                        true
+                      )}
+                    </div>
 
-              <div style={{ marginTop: "20px" }}>
-                <label style={labelStyle}>
-                  Main Image URL
-                </label>
-
-                <input
-                  type="text"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="/travel/bali.jpg"
-                  required
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={{ marginTop: "20px" }}>
-                <label style={labelStyle}>
-                  Description
-                </label>
-
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Enter package description"
-                  rows="4"
-                  required
-                  style={{
-                    ...inputStyle,
-                    resize: "vertical",
-                  }}
-                />
-              </div>
-
-              {/* INCLUSIONS */}
-
-              <div style={sectionStyle}>
-                <div style={sectionHeaderStyle}>
-                  <div>
-                    <h3 style={sectionTitleStyle}>
-                      Package Inclusions
-                    </h3>
-
-                    <p style={sectionDescriptionStyle}>
-                      Add everything included in the package.
-                    </p>
+                    <div className="ff-package-full-field">
+                      <div className="ff-package-field">
+                        <label>Description</label>
+                        <textarea
+                          name="description"
+                          value={formData.description}
+                          onChange={handleChange}
+                          placeholder="Enter package description..."
+                          rows="4"
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={addInclusion}
-                    style={outlineButtonStyle}
-                  >
-                    + Add Inclusion
-                  </button>
-                </div>
+                  {/* INCLUSIONS */}
 
-                {formData.inclusions.length === 0 ? (
-                  <div style={emptySectionStyle}>
-                    No inclusions added yet.
-                  </div>
-                ) : (
-                  formData.inclusions.map((item, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        gap: "10px",
-                        alignItems: "center",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      <input
-                        type="text"
-                        value={item}
-                        onChange={(event) =>
-                          updateInclusion(
-                            index,
-                            event.target.value
-                          )
-                        }
-                        placeholder="Example: Daily breakfast"
-                        required
-                        style={{
-                          ...inputStyle,
-                          flex: 1,
-                        }}
-                      />
+                  <div className="ff-package-form-section">
+                    <div className="ff-package-section-heading ff-package-section-action">
+                      <div className="ff-package-section-title">
+                        <span>02</span>
+                        <div>
+                          <h3>Package Inclusions</h3>
+                          <p>Everything included in the package</p>
+                        </div>
+                      </div>
 
                       <button
                         type="button"
-                        onClick={() =>
-                          removeInclusion(index)
-                        }
-                        style={removeButtonStyle}
+                        className="ff-package-outline-btn"
+                        onClick={addInclusion}
                       >
-                        Remove
+                        + Add Inclusion
                       </button>
                     </div>
-                  ))
-                )}
-              </div>
 
-              {/* EXCLUSIONS */}
-
-              <div style={sectionStyle}>
-                <div style={sectionHeaderStyle}>
-                  <div>
-                    <h3 style={sectionTitleStyle}>
-                      Package Exclusions
-                    </h3>
-
-                    <p style={sectionDescriptionStyle}>
-                      Add things that are not included.
-                    </p>
+                    {renderArrayItems(
+                      formData.inclusions,
+                      updateInclusion,
+                      removeInclusion,
+                      "Example: Daily breakfast",
+                      "Inclusions"
+                    )}
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={addExclusion}
-                    style={outlineButtonStyle}
-                  >
-                    + Add Exclusion
-                  </button>
-                </div>
+                  {/* EXCLUSIONS */}
 
-                {formData.exclusions.length === 0 ? (
-                  <div style={emptySectionStyle}>
-                    No exclusions added yet.
-                  </div>
-                ) : (
-                  formData.exclusions.map((item, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        gap: "10px",
-                        alignItems: "center",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      <input
-                        type="text"
-                        value={item}
-                        onChange={(event) =>
-                          updateExclusion(
-                            index,
-                            event.target.value
-                          )
-                        }
-                        placeholder="Example: Personal expenses"
-                        required
-                        style={{
-                          ...inputStyle,
-                          flex: 1,
-                        }}
-                      />
+                  <div className="ff-package-form-section">
+                    <div className="ff-package-section-heading ff-package-section-action">
+                      <div className="ff-package-section-title">
+                        <span>03</span>
+                        <div>
+                          <h3>Package Exclusions</h3>
+                          <p>Things that are not included</p>
+                        </div>
+                      </div>
 
                       <button
                         type="button"
-                        onClick={() =>
-                          removeExclusion(index)
-                        }
-                        style={removeButtonStyle}
+                        className="ff-package-outline-btn"
+                        onClick={addExclusion}
                       >
-                        Remove
+                        + Add Exclusion
                       </button>
                     </div>
-                  ))
-                )}
+
+                    {renderArrayItems(
+                      formData.exclusions,
+                      updateExclusion,
+                      removeExclusion,
+                      "Example: Personal expenses",
+                      "Exclusions"
+                    )}
+                  </div>
+
+                  {/* ITINERARY */}
+
+                  <div className="ff-package-form-section">
+                    <div className="ff-package-section-heading ff-package-section-action">
+                      <div className="ff-package-section-title">
+                        <span>04</span>
+                        <div>
+                          <h3>Package Itinerary</h3>
+                          <p>Add the day-by-day travel plan</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="ff-package-outline-btn"
+                        onClick={addItineraryDay}
+                      >
+                        + Add Day
+                      </button>
+                    </div>
+
+                    {formData.itinerary.length === 0 ? (
+                      <div className="ff-package-empty-section">
+                        No itinerary days added yet.
+                      </div>
+                    ) : (
+                      formData.itinerary.map((day, index) => (
+                        <div className="ff-package-itinerary-card" key={index}>
+                          <div className="ff-package-itinerary-heading">
+                            <strong>Day {index + 1}</strong>
+
+                            <button
+                              type="button"
+                              className="ff-package-remove-btn"
+                              onClick={() => removeItineraryDay(index)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+
+                          <textarea
+                            value={day}
+                            onChange={(event) =>
+                              updateItineraryDay(index, event.target.value)
+                            }
+                            placeholder={`Day ${index + 1} - Arrival, hotel check-in and sightseeing`}
+                            rows="3"
+                            required
+                          />
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* FORM ACTIONS */}
+
+                  <div className="ff-package-form-actions">
+                    <button
+                      type="button"
+                      className="ff-package-cancel-btn"
+                      onClick={handleCloseForm}
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="ff-package-primary-btn"
+                    >
+                      {editingId ? "Update Package" : "Save Package"}
+                    </button>
+                  </div>
+                </form>
+              </section>
+            )}
+
+            {/* PACKAGE LIST */}
+
+            <div className="ff-package-list-heading">
+              <div>
+                <h2>All Packages</h2>
+                <p>Your available travel packages</p>
               </div>
 
-              {/* ITINERARY */}
+              <span className="ff-package-count">
+                {packages.length} Packages
+              </span>
+            </div>
 
-              <div style={sectionStyle}>
-                <div style={sectionHeaderStyle}>
-                  <div>
-                    <h3 style={sectionTitleStyle}>
-                      Package Itinerary
-                    </h3>
+            {loading ? (
+              <div className="ff-package-empty-state">
+                <div className="ff-package-spinner"></div>
+                <p>Loading packages...</p>
+              </div>
+            ) : packages.length === 0 ? (
+              <div className="ff-package-empty-state">
+                <div className="ff-package-empty-icon">Γ£ê</div>
+                <h3>No packages found</h3>
+                <p>Add your first travel package to get started.</p>
 
-                    <p style={sectionDescriptionStyle}>
-                      Add the day-by-day package itinerary.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={addItineraryDay}
-                    style={outlineButtonStyle}
+                <button
+                  type="button"
+                  className="ff-package-primary-btn"
+                  onClick={() => setShowForm(true)}
+                >
+                  + Add Package
+                </button>
+              </div>
+            ) : (
+              <div className="ff-package-grid">
+                {packages.map((packageItem) => (
+                  <article
+                    className="ff-package-card"
+                    key={packageItem.id}
                   >
-                    + Add Day
-                  </button>
-                </div>
+                    <div className="ff-package-image">
+                      <img
+                        src={packageItem.image}
+                        alt={packageItem.title}
+                      />
 
-                {formData.itinerary.length === 0 ? (
-                  <div style={emptySectionStyle}>
-                    No itinerary days added yet.
-                  </div>
-                ) : (
-                  formData.itinerary.map((day, index) => (
-                    <div
-                      key={index}
-                      style={itemCardStyle}
-                    >
-                      <div style={itemHeaderStyle}>
-                        <strong>
-                          Day {index + 1}
-                        </strong>
+                      <span
+                        className={
+                          packageItem.status === "active"
+                            ? "ff-package-status active"
+                            : "ff-package-status inactive"
+                        }
+                      >
+                        <span></span>
+                        {packageItem.status === "active"
+                          ? "Active"
+                          : "Inactive"}
+                      </span>
+
+                      {packageItem.tag && (
+                        <span className="ff-package-image-tag">
+                          {packageItem.tag}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="ff-package-card-body">
+                      <h3>{packageItem.title}</h3>
+
+                      <p className="ff-package-destination">
+                        ≡ƒôì {packageItem.destination}
+                      </p>
+
+                      <div className="ff-package-info">
+                        <span>Γù╖ {packageItem.duration}</span>
+                        <strong>{packageItem.price}</strong>
+                      </div>
+
+                      <p className="ff-package-description">
+                        {packageItem.description}
+                      </p>
+
+                      <div className="ff-package-card-actions">
+                        <button
+                          type="button"
+                          className="ff-package-edit-btn"
+                          onClick={() => handleEdit(packageItem)}
+                        >
+                          Edit
+                        </button>
 
                         <button
                           type="button"
-                          onClick={() =>
-                            removeItineraryDay(index)
-                          }
-                          style={removeButtonStyle}
+                          className="ff-package-delete-btn"
+                          onClick={() => handleDelete(packageItem.id)}
                         >
-                          Remove
+                          Delete
+                        </button>
+
+                        <button
+                          type="button"
+                          className="ff-package-status-btn"
+                          onClick={() => handleStatusChange(packageItem)}
+                        >
+                          {packageItem.status === "active"
+                            ? "Disable"
+                            : "Enable"}
                         </button>
                       </div>
-
-                      <textarea
-                        value={day}
-                        onChange={(event) =>
-                          updateItineraryDay(
-                            index,
-                            event.target.value
-                          )
-                        }
-                        placeholder={`Example: Day ${
-                          index + 1
-                        } - Arrival, hotel check-in and local sightseeing`}
-                        rows="3"
-                        required
-                        style={{
-                          ...inputStyle,
-                          resize: "vertical",
-                        }}
-                      />
                     </div>
-                  ))
-                )}
+                  </article>
+                ))}
               </div>
+            )}
 
-              {/* FORM BUTTONS */}
+            <div className="ff-package-footer">
+              Freefly Admin Panel ┬╖ Package Management
+            </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "10px",
-                  marginTop: "28px",
-                  paddingTop: "22px",
-                  borderTop: "1px solid #e5e7eb",
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={handleCloseForm}
-                  style={secondaryButtonStyle}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  style={primaryButtonStyle}
-                >
-                  {editingId
-                    ? "Update Package"
-                    : "Save Package"}
-                </button>
-              </div>
-            </form>
           </div>
-        )}
-
-        {/* PACKAGES */}
-
-        {loading ? (
-          <div style={emptyBoxStyle}>
-            <p>Loading packages...</p>
-          </div>
-        ) : packages.length === 0 ? (
-          <div style={emptyBoxStyle}>
-            <h3>No packages found</h3>
-
-            <p>
-              Add your first package to get started.
-            </p>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(300px, 1fr))",
-              gap: "24px",
-            }}
-          >
-            {packages.map((packageItem) => (
-              <div
-                key={packageItem.id}
-                style={packageCardStyle}
-              >
-                {/* IMAGE */}
-
-                <div
-                  style={{
-                    position: "relative",
-                    height: "210px",
-                    overflow: "hidden",
-                    background: "#e5e7eb",
-                  }}
-                >
-                  <img
-                    src={packageItem.image}
-                    alt={packageItem.title}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
-                    }}
-                  />
-
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "14px",
-                      right: "14px",
-                      padding: "6px 11px",
-                      borderRadius: "20px",
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      background:
-                        packageItem.status === "active"
-                          ? "#ecfdf3"
-                          : "#fef2f2",
-                      color:
-                        packageItem.status === "active"
-                          ? "#15803d"
-                          : "#dc2626",
-                    }}
-                  >
-                    {packageItem.status === "active"
-                      ? "● Active"
-                      : "● Inactive"}
-                  </div>
-                </div>
-
-                {/* CONTENT */}
-
-                <div
-                  style={{
-                    padding: "20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                  }}
-                >
-                  <h2
-                    style={{
-                      margin: "0 0 8px",
-                      fontSize: "21px",
-                      fontWeight: "700",
-                    }}
-                  >
-                    {packageItem.title}
-                  </h2>
-
-                  <div
-                    style={{
-                      color: "#64748b",
-                      fontSize: "14px",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    📍 {packageItem.destination}
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "8px",
-                      flexWrap: "wrap",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    <span style={infoBadgeStyle}>
-                      {packageItem.duration}
-                    </span>
-
-                    <span style={priceBadgeStyle}>
-                      {packageItem.price}
-                    </span>
-                  </div>
-
-                  {packageItem.tag && (
-                    <div style={{ marginBottom: "12px" }}>
-                      <span style={categoryBadgeStyle}>
-                        {packageItem.tag}
-                      </span>
-                    </div>
-                  )}
-
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "#64748b",
-                      fontSize: "14px",
-                      lineHeight: "1.7",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {packageItem.description}
-                  </p>
-
-                  <div style={{ flex: 1 }} />
-
-                  <div
-                    style={{
-                      height: "1px",
-                      background: "#e5e7eb",
-                      margin: "20px 0 16px",
-                    }}
-                  />
-
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(3, 1fr)",
-                      gap: "8px",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleEdit(packageItem)
-                      }
-                      style={{
-                        ...actionButtonStyle,
-                        color: "#2563eb",
-                        borderColor: "#bfdbfe",
-                      }}
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleDelete(packageItem.id)
-                      }
-                      style={{
-                        ...actionButtonStyle,
-                        color: "#dc2626",
-                        borderColor: "#fecaca",
-                      }}
-                    >
-                      Delete
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleStatusChange(packageItem)
-                      }
-                      style={{
-                        ...actionButtonStyle,
-                        color:
-                          packageItem.status === "active"
-                            ? "#d97706"
-                            : "#16a34a",
-                        borderColor:
-                          packageItem.status === "active"
-                            ? "#fde68a"
-                            : "#bbf7d0",
-                      }}
-                    >
-                      {packageItem.status === "active"
-                        ? "Disable"
-                        : "Enable"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
-
-// =========================================================
-// STYLES
-// =========================================================
-
-const labelStyle = {
-  display: "block",
-  fontSize: "13px",
-  fontWeight: "600",
-  color: "#334155",
-  marginBottom: "7px",
-};
-
-const inputStyle = {
-  width: "100%",
-  boxSizing: "border-box",
-  padding: "11px 12px",
-  border: "1px solid #cbd5e1",
-  borderRadius: "8px",
-  fontSize: "14px",
-  outline: "none",
-  background: "#ffffff",
-  color: "#111827",
-};
-
-const twoColumnGrid = {
-  display: "grid",
-  gridTemplateColumns:
-    "repeat(2, minmax(0, 1fr))",
-  gap: "20px",
-};
-
-const formCardStyle = {
-  background: "#ffffff",
-  padding: "28px",
-  borderRadius: "14px",
-  marginBottom: "30px",
-  border: "1px solid #e5e7eb",
-  boxShadow:
-    "0 4px 14px rgba(15, 23, 42, 0.06)",
-};
-
-const sectionStyle = {
-  marginTop: "30px",
-  paddingTop: "25px",
-  borderTop: "1px solid #e5e7eb",
-};
-
-const sectionHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: "20px",
-  marginBottom: "18px",
-};
-
-const sectionTitleStyle = {
-  margin: 0,
-  fontSize: "16px",
-  fontWeight: "700",
-  color: "#0f172a",
-};
-
-const sectionDescriptionStyle = {
-  margin: "5px 0 0",
-  fontSize: "13px",
-  color: "#64748b",
-};
-
-const itemCardStyle = {
-  padding: "18px",
-  border: "1px solid #e2e8f0",
-  borderRadius: "10px",
-  marginBottom: "14px",
-  background: "#f8fafc",
-};
-
-const itemHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "16px",
-  color: "#334155",
-};
-
-const emptySectionStyle = {
-  padding: "20px",
-  textAlign: "center",
-  background: "#f8fafc",
-  borderRadius: "8px",
-  color: "#64748b",
-  fontSize: "13px",
-  border: "1px dashed #cbd5e1",
-};
-
-const outlineButtonStyle = {
-  background: "#ffffff",
-  color: "#0f172a",
-  border: "1px solid #cbd5e1",
-  padding: "9px 14px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "13px",
-  whiteSpace: "nowrap",
-};
-
-const removeButtonStyle = {
-  background: "#ffffff",
-  color: "#dc2626",
-  border: "1px solid #fecaca",
-  padding: "7px 11px",
-  borderRadius: "7px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "12px",
-};
-
-const primaryButtonStyle = {
-  background: "#0f172a",
-  color: "#ffffff",
-  border: "none",
-  padding: "11px 20px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "14px",
-};
-
-const secondaryButtonStyle = {
-  background: "#ffffff",
-  color: "#475569",
-  border: "1px solid #cbd5e1",
-  padding: "11px 20px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "14px",
-};
-
-const actionButtonStyle = {
-  background: "#ffffff",
-  border: "1px solid",
-  padding: "10px 8px",
-  borderRadius: "8px",
-  cursor: "pointer",
-  fontWeight: "600",
-  fontSize: "13px",
-};
-
-const packageCardStyle = {
-  background: "#ffffff",
-  borderRadius: "16px",
-  overflow: "hidden",
-  border: "1px solid #e5e7eb",
-  boxShadow:
-    "0 4px 14px rgba(15, 23, 42, 0.06)",
-  display: "flex",
-  flexDirection: "column",
-  minHeight: "560px",
-};
-
-const categoryBadgeStyle = {
-  display: "inline-block",
-  padding: "6px 11px",
-  background: "#f8fafc",
-  color: "#475569",
-  borderRadius: "20px",
-  fontSize: "12px",
-  fontWeight: "600",
-  border: "1px solid #e2e8f0",
-};
-
-const infoBadgeStyle = {
-  display: "inline-block",
-  padding: "6px 10px",
-  background: "#f8fafc",
-  color: "#475569",
-  borderRadius: "20px",
-  fontSize: "12px",
-  fontWeight: "600",
-  border: "1px solid #e2e8f0",
-};
-
-const priceBadgeStyle = {
-  display: "inline-block",
-  padding: "6px 10px",
-  background: "#f1f5f9",
-  color: "#0f172a",
-  borderRadius: "20px",
-  fontSize: "12px",
-  fontWeight: "700",
-  border: "1px solid #cbd5e1",
-};
-
-const emptyBoxStyle = {
-  background: "#ffffff",
-  borderRadius: "12px",
-  padding: "40px",
-  textAlign: "center",
-  border: "1px solid #e5e7eb",
-  color: "#64748b",
-};
 
 export default AdminPackages;
