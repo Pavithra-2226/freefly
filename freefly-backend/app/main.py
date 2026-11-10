@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.routes import media
 from app.config import get_settings
 from app.database.connection import check_db_connection
 from app.routes import destinations
@@ -74,3 +74,4 @@ app.include_router(enquiries.router)
 app.include_router(enquiries.admin_router)
 app.include_router(admin_auth.router)
 app.include_router(admin_destinations.router)
+app.include_router(media.router)

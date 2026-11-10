@@ -29,7 +29,10 @@ class Settings(BaseSettings):
     # Comma-separated in .env, e.g. "http://localhost:5173,http://127.0.0.1:5173"
     CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173"
 
-
+    
+    CLOUDINARY_CLOUD_NAME: str="kgmrhxkm"
+    CLOUDINARY_API_KEY: str= "954719721474747"
+    CLOUDINARY_API_SECRET: str="TRzALDriDqae0sPAONeRnp6co"
     # --- Admin authentication ---
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
