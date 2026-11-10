@@ -1,4 +1,4 @@
-﻿
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -401,7 +401,7 @@ function AdminPackages() {
 
       <aside className="ff-sidebar">
         <div className="ff-logo">
-          <div className="ff-logo-icon">Γ£ê</div>
+          <div className="ff-logo-icon">✈</div>
           <span>
             Freefly<span style={{ color: "#60a5fa" }}>.</span>
           </span>
@@ -415,7 +415,7 @@ function AdminPackages() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/dashboard")}
           >
-            <span>Γûª</span> Dashboard
+            <span>▦</span> Dashboard
           </button>
 
           <button
@@ -423,7 +423,7 @@ function AdminPackages() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/destinations")}
           >
-            <span>ΓùÄ</span> Destinations
+            <span>◎</span> Destinations
           </button>
 
           <button
@@ -431,7 +431,7 @@ function AdminPackages() {
             className="ff-nav-item active"
             onClick={() => navigate("/admin/packages")}
           >
-            <span>Γûú</span> Packages
+            <span>▣</span> Packages
           </button>
 
           <button
@@ -439,7 +439,7 @@ function AdminPackages() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/enquiries")}
           >
-            <span>Γ£ë</span> Enquiries
+            <span>✉</span> Enquiries
           </button>
 
           <button
@@ -447,13 +447,13 @@ function AdminPackages() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/offers")}
           >
-            <span>Γùç</span> Offers
+            <span>◇</span> Offers
           </button>
         </nav>
 
         <div className="ff-sidebar-bottom">
           <div className="ff-sidebar-travel">
-            <span>≡ƒîì</span>
+            <span>🌍</span>
             <div>
               <strong>Explore the world</strong>
               <small>Manage your travel experience</small>
@@ -465,7 +465,7 @@ function AdminPackages() {
             className="ff-logout"
             onClick={handleLogout}
           >
-            Γå¬ <span>Logout</span>
+            ↪ <span>Logout</span>
           </button>
         </div>
       </aside>
@@ -506,7 +506,7 @@ function AdminPackages() {
                   }
                 }}
               >
-                {showForm ? "Γ£ò Close Form" : "+ Add Package"}
+                {showForm ? "✕ Close Form" : "+ Add Package"}
               </button>
             </div>
 
@@ -564,7 +564,7 @@ function AdminPackages() {
                       {renderInput(
                         "Price",
                         "price",
-                        "Example: From Γé╣45,000",
+                        "Example: From ₹45,000",
                         true
                       )}
 
@@ -767,7 +767,7 @@ function AdminPackages() {
               </div>
             ) : packages.length === 0 ? (
               <div className="ff-package-empty-state">
-                <div className="ff-package-empty-icon">Γ£ê</div>
+                <div className="ff-package-empty-icon">✈</div>
                 <h3>No packages found</h3>
                 <p>Add your first travel package to get started.</p>
 
@@ -816,11 +816,11 @@ function AdminPackages() {
                       <h3>{packageItem.title}</h3>
 
                       <p className="ff-package-destination">
-                        ≡ƒôì {packageItem.destination}
+                        📍 {packageItem.destination}
                       </p>
 
                       <div className="ff-package-info">
-                        <span>Γù╖ {packageItem.duration}</span>
+                        <span>◷ {packageItem.duration}</span>
                         <strong>{packageItem.price}</strong>
                       </div>
 
@@ -862,7 +862,7 @@ function AdminPackages() {
             )}
 
             <div className="ff-package-footer">
-              Freefly Admin Panel ┬╖ Package Management
+              Freefly Admin Panel · Package Management
             </div>
 
           </div>

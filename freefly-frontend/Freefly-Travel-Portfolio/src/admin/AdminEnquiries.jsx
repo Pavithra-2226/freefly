@@ -1,4 +1,4 @@
-﻿
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -134,11 +134,11 @@ function AdminEnquiries() {
 
   // DATE FORMAT
   const formatDate = (date) => {
-    if (!date) return "ΓÇö";
+    if (!date) return "—";
 
     const parsedDate = new Date(date);
 
-    if (Number.isNaN(parsedDate.getTime())) return "ΓÇö";
+    if (Number.isNaN(parsedDate.getTime())) return "—";
 
     return parsedDate.toLocaleDateString("en-IN", {
       day: "2-digit",
@@ -161,7 +161,7 @@ function AdminEnquiries() {
 
       <aside className="ff-sidebar">
         <div className="ff-logo">
-          <div className="ff-logo-icon">Γ£ê</div>
+          <div className="ff-logo-icon">✈</div>
           <span>
             Freefly<span style={{ color: "#60a5fa" }}>.</span>
           </span>
@@ -175,7 +175,7 @@ function AdminEnquiries() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/dashboard")}
           >
-            <span>Γûª</span> Dashboard
+            <span>▦</span> Dashboard
           </button>
 
           <button
@@ -183,7 +183,7 @@ function AdminEnquiries() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/destinations")}
           >
-            <span>ΓùÄ</span> Destinations
+            <span>◎</span> Destinations
           </button>
 
           <button
@@ -191,7 +191,7 @@ function AdminEnquiries() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/packages")}
           >
-            <span>Γûú</span> Packages
+            <span>▣</span> Packages
           </button>
 
           <button
@@ -199,7 +199,7 @@ function AdminEnquiries() {
             className="ff-nav-item active"
             onClick={() => navigate("/admin/enquiries")}
           >
-            <span>Γ£ë</span> Enquiries
+            <span>✉</span> Enquiries
           </button>
 
           <button
@@ -207,13 +207,13 @@ function AdminEnquiries() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/offers")}
           >
-            <span>Γùç</span> Offers
+            <span>◇</span> Offers
           </button>
         </nav>
 
         <div className="ff-sidebar-bottom">
           <div className="ff-sidebar-travel">
-            <span>≡ƒîì</span>
+            <span>🌍</span>
             <div>
               <strong>Explore the world</strong>
               <small>Manage your travel experience</small>
@@ -225,7 +225,7 @@ function AdminEnquiries() {
             className="ff-logout"
             onClick={handleLogout}
           >
-            Γå¬ <span>Logout</span>
+            ↪ <span>Logout</span>
           </button>
         </div>
       </aside>
@@ -264,7 +264,7 @@ function AdminEnquiries() {
                 onClick={fetchEnquiries}
                 disabled={loading}
               >
-                Γå╗ Refresh
+                ↻ Refresh
               </button>
             </div>
 
@@ -274,7 +274,7 @@ function AdminEnquiries() {
 
               <div className="ff-enquiry-stat-card">
                 <div className="ff-enquiry-stat-icon total">
-                  <span>Γûñ</span>
+                  <span>▤</span>
                 </div>
 
                 <div>
@@ -285,7 +285,7 @@ function AdminEnquiries() {
 
               <div className="ff-enquiry-stat-card">
                 <div className="ff-enquiry-stat-icon new">
-                  <span>Γ£ë</span>
+                  <span>✉</span>
                 </div>
 
                 <div>
@@ -296,7 +296,7 @@ function AdminEnquiries() {
 
               <div className="ff-enquiry-stat-card">
                 <div className="ff-enquiry-stat-icon contacted">
-                  <span>ΓÿÄ</span>
+                  <span>☎</span>
                 </div>
 
                 <div>
@@ -307,7 +307,7 @@ function AdminEnquiries() {
 
               <div className="ff-enquiry-stat-card">
                 <div className="ff-enquiry-stat-icon closed">
-                  <span>Γ£ô</span>
+                  <span>✓</span>
                 </div>
 
                 <div>
@@ -334,7 +334,7 @@ function AdminEnquiries() {
               <div className="ff-enquiry-filters">
 
                 <div className="ff-enquiry-search">
-                  <span>Γîò</span>
+                  <span>⌕</span>
 
                   <input
                     type="text"
@@ -392,7 +392,7 @@ function AdminEnquiries() {
                 filteredEnquiries.length === 0 && (
                   <div className="ff-enquiry-state">
                     <div className="ff-enquiry-empty-icon">
-                      Γ£ë
+                      ✉
                     </div>
 
                     <h3>No enquiries found</h3>
@@ -447,23 +447,23 @@ function AdminEnquiries() {
                             <td>
                               <div className="ff-enquiry-contact">
                                 <span>
-                                  Γ£ë {enquiry.email || "ΓÇö"}
+                                  ✉ {enquiry.email || "—"}
                                 </span>
 
                                 <span>
-                                  ΓÿÄ {enquiry.phone || "ΓÇö"}
+                                  ☎ {enquiry.phone || "—"}
                                 </span>
                               </div>
                             </td>
 
                             <td>
                               <span className="ff-enquiry-destination">
-                                {enquiry.destination || "ΓÇö"}
+                                {enquiry.destination || "—"}
                               </span>
                             </td>
 
                             <td>
-                              {enquiry.package || "ΓÇö"}
+                              {enquiry.package || "—"}
                             </td>
 
                             <td>
@@ -473,7 +473,7 @@ function AdminEnquiries() {
                             </td>
 
                             <td className="ff-enquiry-travellers">
-                              {enquiry.travellers || "ΓÇö"}
+                              {enquiry.travellers || "—"}
                             </td>
 
                             <td>
@@ -481,7 +481,7 @@ function AdminEnquiries() {
                                 className="ff-enquiry-message"
                                 title={enquiry.message || ""}
                               >
-                                {enquiry.message || "ΓÇö"}
+                                {enquiry.message || "—"}
                               </div>
                             </td>
 
@@ -521,7 +521,7 @@ function AdminEnquiries() {
                                   deleteEnquiry(enquiry.id)
                                 }
                               >
-                                ≡ƒùæ
+                                🗑
                               </button>
                             </td>
 
@@ -543,7 +543,7 @@ function AdminEnquiries() {
             </section>
 
             <div className="ff-package-footer">
-              Freefly Admin Panel ┬╖ Enquiry Management
+              Freefly Admin Panel · Enquiry Management
             </div>
 
           </div>

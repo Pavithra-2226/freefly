@@ -1,4 +1,4 @@
-﻿
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -464,7 +464,7 @@ function AdminDestinations() {
 
       <aside className="ff-sidebar">
         <div className="ff-logo">
-          <div className="ff-logo-icon">Γ£ê</div>
+          <div className="ff-logo-icon">✈</div>
           <span>
             Freefly<span style={{ color: "#60a5fa" }}>.</span>
           </span>
@@ -478,7 +478,7 @@ function AdminDestinations() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/dashboard")}
           >
-            <span>Γûª</span>
+            <span>▦</span>
             Dashboard
           </button>
 
@@ -487,7 +487,7 @@ function AdminDestinations() {
             className="ff-nav-item active"
             onClick={() => navigate("/admin/destinations")}
           >
-            <span>ΓùÄ</span>
+            <span>◎</span>
             Destinations
           </button>
 
@@ -496,7 +496,7 @@ function AdminDestinations() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/packages")}
           >
-            <span>Γûú</span>
+            <span>▣</span>
             Packages
           </button>
 
@@ -505,7 +505,7 @@ function AdminDestinations() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/enquiries")}
           >
-            <span>Γ£ë</span>
+            <span>✉</span>
             Enquiries
           </button>
 
@@ -514,14 +514,14 @@ function AdminDestinations() {
             className="ff-nav-item"
             onClick={() => navigate("/admin/offers")}
           >
-            <span>Γùç</span>
+            <span>◇</span>
             Offers
           </button>
         </nav>
 
         <div className="ff-sidebar-bottom">
           <div className="ff-sidebar-travel">
-            <span>≡ƒîì</span>
+            <span>🌍</span>
             <div>
               <strong>Explore the world</strong>
               <small>Manage your travel experience</small>
@@ -533,7 +533,7 @@ function AdminDestinations() {
             className="ff-logout"
             onClick={handleLogout}
           >
-            Γå¬ <span>Logout</span>
+            ↪ <span>Logout</span>
           </button>
         </div>
       </aside>
@@ -577,7 +577,7 @@ function AdminDestinations() {
                   }
                 }}
               >
-                {showForm ? "Γ£ò Close Form" : "+ Add Destination"}
+                {showForm ? "✕ Close Form" : "+ Add Destination"}
               </button>
             </div>
 
@@ -1000,7 +1000,7 @@ function AdminDestinations() {
               </div>
             ) : destinations.length === 0 ? (
               <div className="ff-destination-empty">
-                <div className="ff-empty-icon">≡ƒîì</div>
+                <div className="ff-empty-icon">🌍</div>
                 <h3>No destinations found</h3>
                 <p>Add your first destination to get started.</p>
 
@@ -1049,7 +1049,7 @@ function AdminDestinations() {
                       <h3>{destination.name}</h3>
 
                       <p className="ff-destination-country">
-                        <span>≡ƒôì</span>
+                        <span>📍</span>
                         {destination.country}
                       </p>
 
@@ -1091,7 +1091,7 @@ function AdminDestinations() {
             )}
 
             <div className="ff-destination-footer">
-              Freefly Admin Panel ┬╖ Destination Management
+              Freefly Admin Panel · Destination Management
             </div>
 
           </div>

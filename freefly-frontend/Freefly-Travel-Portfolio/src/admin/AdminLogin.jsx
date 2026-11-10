@@ -1,4 +1,4 @@
-﻿
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
@@ -52,7 +52,7 @@ function AdminLogin() {
 
       <div className="login-content">
         <div className="login-brand">
-          <div className="brand-icon">Γ£ê</div>
+          <div className="brand-icon">✈</div>
           <div>
             <h1>Free<span>fly</span></h1>
             <p>TOURISM & TRAVELS</p>
@@ -72,7 +72,7 @@ function AdminLogin() {
 
         <form onSubmit={handleLogin}>
           <div className="login-input-group">
-            <span className="input-icon">Γ£ë</span>
+            <span className="input-icon">✉</span>
             <input
               type="email"
               value={email}
@@ -83,7 +83,7 @@ function AdminLogin() {
           </div>
 
           <div className="login-input-group">
-            <span className="input-icon">ΓÖÖ</span>
+            <span className="input-icon">♙</span>
             <input
               type={showPassword ? "text" : "password"}
               value={password}
@@ -107,12 +107,12 @@ function AdminLogin() {
             disabled={loading}
           >
             {loading ? "Signing in..." : "Login"}
-            {!loading && <span>ΓåÆ</span>}
+            {!loading && <span>→</span>}
           </button>
         </form>
 
         <p className="login-footer">
-          ┬⌐ 2026 Freefly Tourism & Travels
+          © 2026 Freefly Tourism & Travels
         </p>
       </div>
     </div>

@@ -1,4 +1,4 @@
-﻿
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
@@ -35,11 +35,11 @@ function AdminDashboard() {
   const [search, setSearch] = useState("");
 
   const menuItems = [
-    { name: "Dashboard", icon: "Γîé", path: "/admin/dashboard" },
-    { name: "Destinations", icon: "Γîû", path: "/admin/destinations" },
-    { name: "Packages", icon: "Γûú", path: "/admin/packages" },
-    { name: "Enquiries", icon: "Γ£ë", path: "/admin/enquiries" },
-    { name: "Offers", icon: "Γùç", path: "/admin/offers" },
+    { name: "Dashboard", icon: "⌂", path: "/admin/dashboard" },
+    { name: "Destinations", icon: "⌖", path: "/admin/destinations" },
+    { name: "Packages", icon: "▣", path: "/admin/packages" },
+    { name: "Enquiries", icon: "✉", path: "/admin/enquiries" },
+    { name: "Offers", icon: "◇", path: "/admin/offers" },
   ];
 
   const fetchDashboardData = async () => {
@@ -170,28 +170,28 @@ function AdminDashboard() {
     {
       title: "Destinations",
       value: stats.destinations,
-      icon: "Γûú",
+      icon: "▣",
       color: "blue",
       growth: "Travel locations",
     },
     {
       title: "Packages",
       value: stats.packages,
-      icon: "Γùº",
+      icon: "◧",
       color: "purple",
       growth: "Travel packages",
     },
     {
       title: "Enquiries",
       value: stats.enquiries,
-      icon: "Γ£ë",
+      icon: "✉",
       color: "orange",
       growth: "Customer requests",
     },
     {
       title: "Offers",
       value: stats.offers,
-      icon: "Γùç",
+      icon: "◇",
       color: "green",
       growth: "Special offers",
     },
@@ -200,25 +200,25 @@ function AdminDashboard() {
   const quickActions = [
     {
       title: "Add Destination",
-      icon: "≡ƒôì",
+      icon: "📍",
       color: "blue",
       path: "/admin/destinations",
     },
     {
       title: "Add Package",
-      icon: "≡ƒº│",
+      icon: "🧳",
       color: "purple",
       path: "/admin/packages",
     },
     {
       title: "View Enquiries",
-      icon: "Γ£ë∩╕Å",
+      icon: "✉️",
       color: "orange",
       path: "/admin/enquiries",
     },
     {
       title: "Create Offer",
-      icon: "≡ƒÅ╖∩╕Å",
+      icon: "🏷️",
       color: "green",
       path: "/admin/offers",
     },
@@ -231,7 +231,7 @@ function AdminDashboard() {
       <aside className="ff-sidebar ff-dashboard-sidebar">
 
         <div className="ff-logo ff-dashboard-logo">
-          <div className="ff-logo-icon">Γ£ê</div>
+          <div className="ff-logo-icon">✈</div>
           <div>
             <h2>Free<span>fly</span></h2>
             <p>TOURISM & TRAVELS</p>
@@ -256,7 +256,7 @@ function AdminDashboard() {
 
         <div className="ff-dashboard-sidebar-bottom">
           <div className="ff-sidebar-travel">
-            <span>Γ£ê</span>
+            <span>✈</span>
             <p>Explore the world with Freefly.</p>
           </div>
 
@@ -265,7 +265,7 @@ function AdminDashboard() {
             className="ff-logout"
             onClick={handleLogout}
           >
-            ΓçÑ Logout
+            ⇥ Logout
           </button>
         </div>
       </aside>
@@ -277,7 +277,7 @@ function AdminDashboard() {
         <header className="ff-dashboard-topbar">
 
           <div className="ff-dashboard-search">
-            <span>Γîò</span>
+            <span>⌕</span>
             <input
               type="search"
               placeholder="Search customers or destinations..."
@@ -287,7 +287,7 @@ function AdminDashboard() {
           </div>
 
           <div className="ff-dashboard-top-profile">
-            <div className="ff-dashboard-notification">ΓÖº</div>
+            <div className="ff-dashboard-notification">♧</div>
 
             <div className="ff-dashboard-profile-avatar">
               {(adminUser.name || "A").charAt(0).toUpperCase()}
@@ -307,14 +307,14 @@ function AdminDashboard() {
             <div className="ff-modern-banner-content">
               <span>YOUR TRAVEL CONTROL CENTER</span>
               <h1>
-                Welcome Back, {adminUser.name || "Admin"}! ≡ƒæï
+                Welcome Back, {adminUser.name || "Admin"}! 👋
               </h1>
               <p>
                 Manage your travel website and create unforgettable journeys.
               </p>
             </div>
 
-            <div className="ff-modern-banner-plane">Γ£ê</div>
+            <div className="ff-modern-banner-plane">✈</div>
           </section>
 
           {/* STATISTICS */}
@@ -329,7 +329,7 @@ function AdminDashboard() {
                 </div>
 
                 <div className="ff-modern-stat-info">
-                  <h2>{loading ? "ΓÇö" : card.value}</h2>
+                  <h2>{loading ? "—" : card.value}</h2>
                   <p>{card.title}</p>
                   <span>{card.growth}</span>
                 </div>
@@ -344,7 +344,7 @@ function AdminDashboard() {
             <div className="ff-modern-quick-panel">
               <div className="ff-modern-panel-heading">
                 <div>
-                  <h2><span>╧ƒ</span> Quick Actions</h2>
+                  <h2><span>ϟ</span> Quick Actions</h2>
                   <p>Quickly access your main management areas.</p>
                 </div>
               </div>
@@ -371,14 +371,14 @@ function AdminDashboard() {
 
               <div className="ff-modern-panel-heading enquiry-heading">
                 <div>
-                  <h2><span>Γÿ╖</span> Recent Enquiries</h2>
+                  <h2><span>☷</span> Recent Enquiries</h2>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => navigate("/admin/enquiries")}
                 >
-                  View All ΓåÆ
+                  View All →
                 </button>
               </div>
 
@@ -388,7 +388,7 @@ function AdminDashboard() {
                 </div>
               ) : filteredEnquiries.length === 0 ? (
                 <div className="ff-modern-enquiry-empty">
-                  <span>Γ£ë</span>
+                  <span>✉</span>
                   <p>No recent enquiries found.</p>
                 </div>
               ) : (
@@ -425,7 +425,7 @@ function AdminDashboard() {
 
           {/* FOOTER */}
           <footer className="ff-dashboard-footer">
-            ┬⌐ 2026 Freefly Tourism & Travels. All rights reserved.
+            © 2026 Freefly Tourism & Travels. All rights reserved.
           </footer>
 
         </div>
