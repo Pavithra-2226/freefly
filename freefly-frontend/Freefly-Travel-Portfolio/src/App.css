@@ -178,12 +178,12 @@ nav .whatsapp {
 }
 
 .hero h1,
-.page-hero h1,
 .cta h2 {
-    font: 800 clamp(48px, 7vw, 88px)/.98 Manrope;
+  font: 800 clamp(48px, 7vw, 88px)/.98 Manrope;
     letter-spacing: -4px;
     margin: 20px 0
 }
+  .page-hero h1,
 
 .hero h1 em,
 .cta h2 em {
@@ -7368,5 +7368,1390 @@ button:hover,
 
   .ff-modern-enquiry-time span {
     font-size: 9px;
+  }
+}
+
+/* =========================================
+   FREEFLY SERVICES PAGE
+========================================= */
+
+.services-page {
+  width: 100%;
+  overflow: hidden;
+  background: #fffdfa;
+}
+
+.services-main-section {
+  padding: 0 0 38px;
+  background: #fffdfa;
+}
+
+.services-world-intro {
+  text-align: center;
+  padding: 30px 20px 42px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.services-world-intro > span,
+.services-process-heading > div > span {
+  display: block;
+  color: #a96d13;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  margin-bottom: 10px;
+}
+
+.services-world-intro h2 {
+  font-family: Georgia, serif;
+  font-size: clamp(27px, 3vw, 38px);
+  line-height: 1.2;
+  color: #092b35;
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.services-world-intro h2 em,
+.services-showcase-heading h2 em {
+  color: #a96d13;
+  font-weight: 500;
+}
+
+.services-world-intro p {
+  max-width: 650px;
+  margin: auto;
+  color: #34454b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* SERVICES HEADING */
+
+.services-showcase {
+  width: 100%;
+}
+
+.services-showcase-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 35px;
+  margin: 0 0 24px;
+  padding: 0 18px;
+}
+
+.services-label {
+  display: block;
+  color: #a96d13;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.2px;
+  margin-bottom: 7px;
+}
+
+.services-showcase-heading h2 {
+  font-family: Georgia, serif;
+  color: #092b35;
+  font-size: clamp(27px, 3vw, 38px);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.services-showcase-heading > p {
+  max-width: 340px;
+  padding-left: 25px;
+  border-left: 2px solid #b77c27;
+  color: #34454b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* SERVICE CARDS GRID */
+
+.services-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.services-showcase-card {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #eee8df;
+  border-radius: 11px;
+  box-shadow: 0 4px 12px rgba(12, 38, 45, 0.07);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.services-showcase-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(12, 38, 45, 0.13);
+}
+
+.services-showcase-image {
+  position: relative;
+  width: 100%;
+  height: 145px;
+  overflow: hidden;
+  background: #e9eceb;
+}
+
+.services-showcase-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.services-showcase-card:hover .services-showcase-image img {
+  transform: scale(1.07);
+}
+
+.services-showcase-number {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  min-width: 29px;
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fffdfa;
+  color: #95600e;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+}
+
+.services-showcase-content {
+  padding: 12px 13px 15px;
+}
+
+.services-showcase-category {
+  display: block;
+  color: #a36a17;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.services-showcase-content h3 {
+  color: #092b35;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 0 0 7px;
+}
+
+.services-showcase-content p {
+  color: #48565b;
+  font-size: 11px;
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+
+.services-showcase-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #98600d;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 800;
+  transition: gap 0.25s ease;
+}
+
+.services-showcase-link:hover {
+  gap: 10px;
+  color: #c18b32;
+}
+
+/* WHY FREEFLY SECTION */
+
+.services-benefits {
+  padding: 35px 20px;
+  background: #06343c;
+  color: #fff;
+}
+
+.services-benefits-inner {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr);
+  align-items: center;
+  gap: 20px;
+}
+
+.services-benefits-title {
+  padding-right: 20px;
+}
+
+.services-benefits-title > span {
+  display: block;
+  color: #e5a32e;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.services-benefits-title h2 {
+  font-family: Georgia, serif;
+  color: #fff;
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.services-benefits-title h2 em {
+  display: block;
+  color: #e6a32d;
+  font-weight: 500;
+}
+
+.services-benefit {
+  min-height: 105px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.services-benefit > span {
+  color: #e5a32e;
+  font-family: Georgia, serif;
+  font-size: 24px;
+}
+
+.services-benefit h3 {
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 15px;
+  line-height: 1.3;
+  margin: 5px 0;
+}
+
+.services-benefit p {
+  color: #d4e0e0;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* TRAVEL PROCESS */
+
+.services-process {
+  padding: 35px 20px 45px;
+  background: #fffdfa;
+}
+
+.services-process-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 25px;
+  padding: 0 18px;
+}
+
+.services-process-heading h2 {
+  font-family: Georgia, serif;
+  font-size: clamp(25px, 3vw, 34px);
+  color: #092b35;
+  margin: 0;
+}
+
+.services-process-heading > p {
+  max-width: 340px;
+  padding-left: 22px;
+  border-left: 2px solid #b77c27;
+  color: #48565b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.services-process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.services-process-card {
+  position: relative;
+  padding: 20px 18px;
+  min-height: 125px;
+  background: #fff;
+  border: 1px solid #e9e1d7;
+  border-radius: 9px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.services-process-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(12, 38, 45, 0.08);
+}
+
+.services-process-card > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  background: #f8f0e3;
+  color: #a96d13;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.services-process-card h3 {
+  color: #102e38;
+  font-size: 14px;
+  margin: 12px 0 6px;
+}
+
+.services-process-card p {
+  color: #647078;
+  font-size: 11px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+  .services-showcase-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .services-benefits-inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .services-benefits-title {
+    grid-column: 1 / -1;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+  .services-world-intro {
+    padding: 25px 15px 30px;
+  }
+
+  .services-showcase-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 0 5px;
+  }
+
+  .services-showcase-heading > p {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .services-showcase-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .services-showcase-image {
+    height: 115px;
+  }
+
+  .services-showcase-content {
+    padding: 10px;
+  }
+
+  .services-showcase-content h3 {
+    font-size: 14px;
+  }
+
+  .services-showcase-content p {
+    font-size: 10px;
+  }
+
+  .services-benefits-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 12px;
+  }
+
+  .services-benefit {
+    padding-left: 12px;
+  }
+
+  .services-process-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 5px;
+    gap: 12px;
+  }
+
+  .services-process-heading > p {
+    max-width: 100%;
+  }
+
+  .services-process-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .services-showcase-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .services-showcase-image {
+    height: 175px;
+  }
+
+  .services-benefits-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .services-process-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* =================================
+   SERVICES PAGE - DARK THEME
+================================= */
+
+.services-page,
+.services-main-section,
+.services-world-intro,
+.services-process {
+  background: #080d10 !important;
+}
+
+/* Main headings */
+.services-world-intro h2,
+.services-showcase-heading h2,
+.services-process-heading h2 {
+  color: #ffffff;
+}
+
+/* Description text */
+.services-world-intro p,
+.services-showcase-heading > p,
+.services-process-heading > p {
+  color: #c2c9cc;
+}
+
+/* Service cards */
+.services-showcase-card {
+  background: #121a1e;
+  border: 1px solid #26343a;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.25);
+}
+
+.services-showcase-content h3 {
+  color: #ffffff;
+}
+
+.services-showcase-content p {
+  color: #b5c0c4;
+}
+
+/* Travel process cards */
+.services-process-card {
+  background: #121a1e;
+  border: 1px solid #29383e;
+}
+
+.services-process-card h3 {
+  color: #ffffff;
+}
+
+.services-process-card p {
+  color: #b5c0c4;
+}
+
+/* Gold accents */
+.services-world-intro h2 em,
+.services-showcase-heading h2 em,
+.services-label,
+.services-benefit > span {
+  color: #d69a36;
+}
+
+/* Benefits section */
+.services-benefits {
+  background: #062e35;
+}
+
+/* ===== FREEFLY HOMEPAGE REDESIGN ===== */
+
+.home-redesign {
+  background: #fffefa;
+  color: #123b36;
+}
+
+.home-kicker {
+  display: inline-block;
+  color: #648b79;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 17px;
+}
+
+.home-about {
+  padding-top: 90px;
+  padding-bottom: 60px;
+}
+
+.home-about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 85px;
+}
+
+.home-about-visual {
+  position: relative;
+  min-height: 430px;
+  padding: 15px 35px 45px 0;
+}
+
+.home-about-main {
+  width: 88%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.home-about-small {
+  position: absolute;
+  width: 52%;
+  height: 185px;
+  object-fit: cover;
+  right: 0;
+  bottom: 0;
+  border: 9px solid #fffefa;
+  border-radius: 5px;
+}
+
+.home-about-decoration {
+  position: absolute;
+  right: 5px;
+  top: 0;
+  font-size: 60px;
+  color: #7d9b77;
+}
+
+.home-about-content h2,
+.home-featured-content h2,
+.home-why-grid h2 {
+  font-family: Georgia, serif;
+  font-size: clamp(34px, 4vw, 49px);
+  line-height: 1.13;
+  letter-spacing: -1.5px;
+  color: #123b36;
+  margin: 0 0 22px;
+}
+
+.home-about-content h2 span,
+.home-why-grid h2 span {
+  color: #338c80;
+}
+
+.home-about-content p,
+.home-featured-content p,
+.home-why-grid > div:first-child p {
+  color: #687a78;
+  font-size: 15px;
+  line-height: 1.9;
+  margin-bottom: 18px;
+}
+
+.home-about-content .btn,
+.home-featured-content .btn {
+  margin-top: 12px;
+}
+
+.home-benefits {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 65px;
+  border-top: 1px solid #e5ebe5;
+  padding-top: 35px;
+}
+
+.home-benefit {
+  text-align: center;
+  padding: 15px 25px;
+  border-right: 1px solid #dce5df;
+}
+
+.home-benefit:last-child {
+  border-right: none;
+}
+
+.home-benefit svg {
+  color: #205d53;
+  margin: 0 auto 15px;
+}
+
+.home-benefit strong,
+.home-why-item strong {
+  display: block;
+  font-size: 14px;
+  color: #173e38;
+}
+
+.home-benefit p,
+.home-why-item p {
+  color: #778783;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 9px;
+}
+
+.home-featured {
+  padding: 85px 0;
+  background: #f8f8f2;
+}
+
+.home-featured-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: center;
+  gap: 55px;
+}
+
+.home-featured-image {
+  position: relative;
+}
+
+.home-featured-image img {
+  width: 100%;
+  height: 390px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.home-why {
+  padding: 85px 0;
+}
+
+.home-why-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.7fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.home-why-items {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.home-why-item {
+  text-align: center;
+  padding: 15px;
+  border-right: 1px solid #dce5df;
+}
+
+.home-why-item:last-child {
+  border-right: none;
+}
+
+.home-why-item svg {
+  color: #205d53;
+  margin: 0 auto 15px;
+}
+
+.home-gallery {
+  background: #fafaf7;
+  padding: 80px 0 95px;
+}
+
+.home-gallery-heading {
+  text-align: center;
+  margin-bottom: 38px;
+}
+
+.home-gallery-heading h2 {
+  font-family: Georgia, serif;
+  font-size: clamp(30px, 4vw, 42px);
+  color: #123b36;
+  margin: 0 0 12px;
+}
+
+.home-gallery-heading p {
+  color: #71817d;
+  font-size: 14px;
+}
+
+.home-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.home-gallery-item {
+  height: 190px;
+  overflow: hidden;
+  border-radius: 7px;
+}
+
+.home-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.home-gallery-item:hover img {
+  transform: scale(1.08);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 900px) {
+  .home-about-grid,
+  .home-featured-grid,
+  .home-why-grid {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .home-about-visual {
+    min-height: 350px;
+  }
+
+  .home-about-main {
+    height: 300px;
+  }
+
+  .home-benefits {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .home-benefit:nth-child(2) {
+    border-right: none;
+  }
+
+  .home-why-items {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 25px;
+  }
+
+  .home-why-item:nth-child(2) {
+    border-right: none;
+  }
+
+  .home-gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .home-about,
+  .home-featured,
+  .home-why,
+  .home-gallery {
+    padding-top: 55px;
+    padding-bottom: 55px;
+  }
+
+  .home-about-visual {
+    min-height: 280px;
+    padding-right: 15px;
+  }
+
+  .home-about-main {
+    width: 92%;
+    height: 240px;
+  }
+
+  .home-about-small {
+    height: 125px;
+    width: 52%;
+    border-width: 6px;
+  }
+
+  .home-benefits {
+    margin-top: 35px;
+    padding-top: 20px;
+  }
+
+  .home-benefit {
+    padding: 15px 10px;
+  }
+
+  .home-featured-image img {
+    height: 260px;
+  }
+
+  .home-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .home-gallery-item {
+    height: 145px;
+  }
+
+  .home-why-items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== FREEFLY PREMIUM DARK HOMEPAGE ===== */
+
+.home-redesign {
+  background: #080b0d;
+  color: #f5f5f5;
+}
+
+/* About section */
+.home-about {
+  background: #080b0d;
+}
+
+.home-about-content h2,
+.home-about-content h2 span {
+  color: #ffffff;
+}
+
+.home-about-content p {
+  color: #a5adb4;
+}
+
+/* Section labels */
+.home-kicker {
+  color: #21c7bd;
+}
+
+/* Benefits */
+.home-benefits {
+  border-color: #252c30;
+}
+
+.home-benefit {
+  border-color: #252c30;
+}
+
+.home-benefit strong {
+  color: #ffffff;
+}
+
+.home-benefit p {
+  color: #9da7ad;
+}
+
+.home-benefit svg {
+  color: #21c7bd;
+}
+
+/* Featured destination */
+.home-featured {
+  background: #101518;
+}
+
+.home-featured-content h2 {
+  color: #ffffff;
+}
+
+.home-featured-content p {
+  color: #a5adb4;
+}
+
+/* Why choose us */
+.home-why {
+  background: #080b0d;
+}
+
+.home-why-grid h2 {
+  color: #ffffff;
+}
+
+.home-why-grid h2 span {
+  color: #21c7bd;
+}
+
+.home-why-grid > div:first-child p {
+  color: #a5adb4;
+}
+
+.home-why-item {
+  border-color: #252c30;
+}
+
+.home-why-item strong {
+  color: #ffffff;
+}
+
+.home-why-item p {
+  color: #9da7ad;
+}
+
+.home-why-item svg {
+  color: #21c7bd;
+}
+
+/* Gallery */
+.home-gallery {
+  background: #101518;
+}
+
+.home-gallery-heading h2 {
+  color: #ffffff;
+}
+
+.home-gallery-heading p {
+  color: #a5adb4;
+}
+
+.home-gallery-item {
+  border: 1px solid #293438;
+}
+
+/* CTA */
+.home-redesign > section:last-child {
+  color: #ffffff;
+}
+
+/* Buttons */
+.home-redesign .btn {
+  background: #17b9ae;
+  color: #061312;
+  border-color: #17b9ae;
+}
+
+.home-redesign .btn:hover {
+  background: #ffffff;
+  color: #080b0d;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .home-benefit,
+  .home-why-item {
+    border-color: #252c30;
+  }
+}
+
+/* =========================================
+   FREEFLY - ABOUT PAGE
+========================================= */
+
+.about-page {
+  width: 100%;
+  overflow: hidden;
+  background: #ffffff;
+  color: #10243a;
+}
+
+.about-page .container {
+  width: min(1200px, 90%);
+  margin: 0 auto;
+}
+
+.about-page .section {
+  padding: 90px 0;
+}
+
+/* =========================================
+   ABOUT INTRO
+========================================= */
+
+.about-intro {
+  background: #ffffff;
+}
+
+.about-intro .split {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  align-items: center;
+  gap: 75px;
+}
+
+/* Image composition */
+
+.about-image-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 290px 180px;
+  gap: 16px;
+  min-width: 0;
+}
+
+.about-image-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.about-image-main {
+  grid-column: 1 / 3;
+  border-radius: 18px 65px 18px 18px;
+}
+
+.about-image-secondary {
+  grid-column: 1 / 3;
+  width: 70% !important;
+  height: 180px;
+  margin-left: auto;
+  border-radius: 18px 18px 18px 55px;
+  border: 5px solid #ffffff;
+  margin-top: -2px;
+}
+
+.about-image-grid:hover img {
+  transform: scale(1.015);
+}
+
+/* About content */
+
+.about-content {
+  position: relative;
+}
+
+.about-content .eyebrow,
+.about-content .section-heading span,
+.about-page .eyebrow {
+  color: #1263a5;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+.about-content h2 {
+  color: #10243a;
+  font-size: clamp(30px, 3.2vw, 44px);
+  line-height: 1.15;
+  font-weight: 750;
+  margin: 14px 0 22px;
+}
+
+.about-content h2::after {
+  content: "";
+  display: block;
+  width: 75px;
+  height: 4px;
+  background: #f5bd32;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.about-content p {
+  color: #586779;
+  font-size: 15px;
+  line-height: 1.9;
+  margin: 0 0 17px;
+}
+
+/* =========================================
+   SERVICES SECTION
+========================================= */
+
+.about-services-section {
+  background: #f1f7fc;
+  position: relative;
+}
+
+.about-services-heading {
+  max-width: 650px;
+  margin-bottom: 42px;
+}
+
+.about-services-heading h2 {
+  color: #10243a;
+  font-size: clamp(30px, 3vw, 42px);
+  line-height: 1.2;
+  margin: 14px 0;
+}
+
+.about-services-heading p {
+  color: #66778a;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* Service cards */
+
+.about-services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.about-service-card {
+  position: relative;
+  min-height: 170px;
+  padding: 28px 23px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ffffff;
+  border: 1px solid #e3edf6;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(19, 62, 100, 0.045);
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.about-service-card:hover {
+  transform: translateY(-7px);
+  border-color: #a9cce9;
+  box-shadow: 0 15px 35px rgba(19, 62, 100, 0.12);
+}
+
+.service-number {
+  color: #e3aa22;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.about-service-card h3 {
+  max-width: 210px;
+  color: #173653;
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 700;
+  margin: 22px 0 10px;
+}
+
+.service-arrow {
+  position: absolute;
+  right: 22px;
+  bottom: 23px;
+  color: #1263a5;
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.about-service-card:hover .service-arrow {
+  transform: translate(4px, -4px);
+}
+
+/* =========================================
+   BRAND MESSAGE
+========================================= */
+
+.about-brand-message {
+  position: relative;
+  padding: 100px 0;
+  text-align: center;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7, 34, 57, 0.92),
+      rgba(12, 67, 108, 0.84)
+    ),
+    url("/images/destinations-hero.png") center/cover no-repeat;
+}
+
+.about-brand-message .eyebrow {
+  color: #f5bd32;
+}
+
+.about-brand-message h2 {
+  color: #ffffff;
+  font-size: clamp(35px, 5vw, 62px);
+  line-height: 1.2;
+  font-weight: 750;
+  margin: 22px 0 0;
+  letter-spacing: -1.5px;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 1024px) {
+  .about-intro .split {
+    gap: 40px;
+  }
+
+  .about-image-grid {
+    grid-template-rows: 240px 150px;
+  }
+
+  .about-services-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .about-page .section {
+    padding: 65px 0;
+  }
+
+  .about-intro .split {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .about-image-grid {
+    grid-template-rows: 230px 145px;
+  }
+
+  .about-content h2 {
+    font-size: 34px;
+  }
+
+  .about-services-heading {
+    margin-bottom: 30px;
+  }
+
+  .about-service-card {
+    min-height: 150px;
+    padding: 22px 18px;
+  }
+
+  .about-service-card h3 {
+    font-size: 15px;
+  }
+
+  .about-brand-message {
+    padding: 75px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-page .container {
+    width: 90%;
+  }
+
+  .about-services-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .about-image-grid {
+    grid-template-rows: 190px 125px;
+    gap: 10px;
+  }
+
+  .about-image-secondary {
+    height: 125px;
+  }
+
+  .about-service-card {
+    min-height: 145px;
+    padding: 18px 14px;
+  }
+
+  .about-service-card h3 {
+    font-size: 14px;
+  }
+
+  .about-brand-message h2 {
+    font-size: 36px;
+  }
+}
+
+/* =========================================
+   FREEFLY ABOUT - DARK THEME
+========================================= */
+
+.about-page {
+  background: #080b10;
+  color: #ffffff;
+}
+
+/* About intro */
+
+.about-intro {
+  background: #080b10;
+}
+
+.about-content h2,
+.about-services-heading h2 {
+  color: #ffffff;
+}
+
+.about-content p,
+.about-services-heading p {
+  color: #aab4c2;
+}
+
+.about-content .eyebrow,
+.about-page .eyebrow {
+  color: #e9b94f;
+}
+
+/* Images */
+
+.about-image-grid img {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Services section */
+
+.about-services-section {
+  background: #10151d;
+}
+
+.about-service-card {
+  background: #171e28;
+  border: 1px solid #293443;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.about-service-card h3 {
+  color: #f4f6fa;
+}
+
+.service-number,
+.service-arrow {
+  color: #e9b94f;
+}
+
+.about-service-card:hover {
+  background: #202a37;
+  border-color: #c49a43;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+/* Brand message */
+
+.about-brand-message {
+  background:
+    linear-gradient(
+      rgba(0, 0, 0, 0.82),
+      rgba(0, 0, 0, 0.88)
+    ),
+    url("/images/destinations-hero.png") center/cover no-repeat;
+}
+
+.about-brand-message h2 {
+  color: #ffffff;
+}
+
+.about-brand-message .eyebrow {
+  color: #e9b94f;
+}
+
+/* Gold heading underline */
+
+.about-content h2::after {
+  background: #e9b94f;
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .about-intro,
+  .about-services-section {
+    padding-top: 60px;
+    padding-bottom: 60px;
   }
 }

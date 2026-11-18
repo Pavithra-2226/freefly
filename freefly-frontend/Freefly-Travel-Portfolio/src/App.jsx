@@ -13,6 +13,7 @@ import AdminDashboard from "./admin/AdminDashboard";
 import ProtectedAdminRoute from "./admin/ProtectedAdminRoute";
 import AdminDestinations from "./admin/AdminDestinations";
 import AdminPackages from "./admin/AdminPackages";
+import AdminServices from "./admin/AdminServices";
 import DestinationDetails from "./DestinationDetails";
 import PackageDetails from "./PackageDetails";
 import AdminEnquiries from "./admin/AdminEnquiries";
@@ -55,6 +56,91 @@ const navItems = [
   ['/services', 'Services'],
   ['/contact', 'Contact']
 ]
+
+/* =====================================================
+   SCROLL REVEAL ANIMATION (added)
+   ===================================================== */
+function useScrollReveal() {
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    // Styles are injected here so only App.jsx changes
+    const style = document.createElement('style')
+    style.setAttribute('data-scroll-reveal', '')
+    style.textContent = `
+      .reveal { opacity: 0; translate: 0 45px; }
+      .reveal.reveal-left { translate: -50px 0; }
+      .reveal.reveal-right { translate: 50px 0; }
+      .reveal.reveal-in {
+        animation: revealIn 0.85s cubic-bezier(.22,.61,.36,1) both;
+        animation-delay: var(--reveal-delay, 0s);
+      }
+      @keyframes revealIn {
+        from { opacity: 0; }
+        to   { opacity: 1; translate: 0 0; }
+      }
+    `
+    document.head.appendChild(style)
+
+    const selectors = [
+      '.section-heading', '.heading-row .button', '.why-layout > div',
+      '.benefit', '.destination-card', '.package-card',
+      '.gallery-grid a', '.gallery-grid button',
+      '.filter-row', '.search-row',
+      '.about-points > div', '.stats > div', '.mission-block',
+      '.mission-image', '.split img', '.split > div',
+      '.services-world-intro', '.services-showcase-heading',
+      '.services-showcase-card', '.services-benefits-title',
+      '.services-benefit', '.services-process-heading',
+      '.services-process-card',
+      '.contact-details p', '.contact-section form',
+      '.footer-grid > div', '.footer-bottom'
+    ].join(',')
+
+    const seen = new WeakSet()
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal-in')
+            io.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+    )
+
+    const scan = () => {
+      document.querySelectorAll(selectors).forEach((el) => {
+        if (seen.has(el) || el.closest('.hero, .page-hero, .cta-section')) return
+        seen.add(el)
+
+        const siblings = el.parentElement ? [...el.parentElement.children] : []
+        const index = Math.max(siblings.indexOf(el), 0)
+        el.style.setProperty('--reveal-delay', `${(index % 4) * 0.1}s`)
+
+        // Split layouts slide in from the sides
+        if (el.matches('.split > img, .mission-image')) el.classList.add('reveal-left')
+        if (el.matches('.split > div:last-child')) el.classList.add('reveal-right')
+
+        el.classList.add('reveal')
+        io.observe(el)
+      })
+    }
+
+    scan()
+    // Re-scan when routes change or API data (destinations/packages) loads
+    const mo = new MutationObserver(scan)
+    mo.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      mo.disconnect()
+      io.disconnect()
+      style.remove()
+    }
+  }, [])
+}
 
 const Button = ({ children, to = '#', secondary = false }) => (
   <Link
@@ -212,45 +298,116 @@ function Footer() {
 }
 
 function ServiceCards() {
+  const [serviceItems, setServiceItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchServices = async () => {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/services",
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        const activeServices = (Array.isArray(data) ? data : [])
+          .filter((service) => service.status === "active")
+          .sort(
+            (a, b) =>
+              (a.sort_order ?? 0) - (b.sort_order ?? 0)
+          );
+
+        setServiceItems(activeServices);
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        console.error("Services loading error:", err);
+        setError("Unable to load services. Please try again later.");
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchServices();
+
+    return () => controller.abort();
+  }, []);
+
   return (
-    <div className="service-grid">
-
-      <div className="services-intro">
-        <span>TRAVEL SERVICES</span>
-
-        <h2>
-          Everything for the <em>journey.</em>
-        </h2>
+    <div className="services-showcase">
+      <div className="services-showcase-heading">
+        <div>
+          <span className="services-label">EXPLORE OUR SERVICES</span>
+          <h2>
+            Everything Travel, <em>In One Place.</em>
+          </h2>
+        </div>
 
         <p>
-          From seamless bookings to personalized travel support,
-          we take care of the details that make every journey effortless.
+          Explore our range of travel services, designed to
+          make planning your next journey easier.
         </p>
       </div>
 
-      {services.map((service, index) => (
-        <article className="service-card" key={service.title}>
+      {loading && <p>Loading services...</p>}
 
-          <div className="service-number">
-            0{index + 1}
-          </div>
+      {error && <p className="form-error">{error}</p>}
 
-          <ArrowRight className="service-icon" size={24} />
+      {!loading && !error && serviceItems.length === 0 && (
+        <p>No services available at the moment.</p>
+      )}
 
-          <h3>{service.title}</h3>
+      {!loading && !error && serviceItems.length > 0 && (
+        <div className="services-showcase-grid">
+          {serviceItems.map((service, index) => (
+            <article
+              className="services-showcase-card"
+              key={service.id || service._id || `${service.title}-${index}`}
+            >
+              <div className="services-showcase-image">
+                <img
+                  src={service.image || servicesHero}
+                  alt={service.title || "Freefly travel service"}
+                  loading="lazy"
+                />
 
-          <p>{service.description}</p>
+                <span className="services-showcase-number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              </div>
 
-          <Link to="/contact" className="service-link">
-            Explore
-            <ArrowRight size={15} />
-          </Link>
+              <div className="services-showcase-content">
+                {service.tag && (
+                  <span className="services-showcase-category">
+                    {service.tag}
+                  </span>
+                )}
 
-        </article>
-      ))}
+                <h3>{service.title}</h3>
+                <p>{service.description}</p>
 
+                <Link
+                  to={service.button_link || "/contact"}
+                  className="services-showcase-link"
+                >
+                  {service.button_text || "Enquire Now"}
+                  <ArrowRight size={15} />
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
-  )
+  );
 }
 
 function DestinationCards({ items = destinations }) {
@@ -405,191 +562,240 @@ function CTA() {
   );
 }
 
+
 function Home() {
+  const benefits = [
+    {
+      title: "Best Price Guarantee",
+      text: "Get the best value for your travel plans.",
+      icon: Plane,
+    },
+    {
+      title: "Safe & Secure",
+      text: "Your comfort and safety come first.",
+      icon: ShieldCheck,
+    },
+    {
+      title: "24/7 Support",
+      text: "We're always here whenever you need us.",
+      icon: Headphones,
+    },
+    {
+      title: "Expert Guides",
+      text: "Explore every place with local expertise.",
+      icon: MapPin,
+    },
+  ];
+
+  const galleryImages = [
+    {
+      src: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=700",
+      alt: "Beautiful mountain landscape",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700",
+      alt: "Tropical beach",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=700",
+      alt: "Mountain adventure",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=700",
+      alt: "Coastal holiday",
+    },
+    {
+      src: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=700",
+      alt: "Ocean destination",
+    },
+  ];
+
   return (
-    <main>
+    <main className="home-redesign">
 
+      {/* HERO - PRESERVED */}
       <section className="hero">
-  <div className="hero-overlay" />
+        <div className="hero-overlay" />
 
-  <div className="container hero-content">
-    <span className="eyebrow">
-      Explore the world with Freefly
-    </span>
+        <div className="container hero-content">
+          <span className="eyebrow">
+            Explore the world with Freefly
+          </span>
 
-    <h1>
-      Your Journey
-      <br />
-      <em>Begins Here</em>
-    </h1>
+          <h1>
+            Your Journey
+            <br />
+            <em>Begins Here</em>
+          </h1>
 
-    <p>
-      Discover beautiful destinations, curated travel packages
-      and unforgettable experiences with Freefly Tourism & Travels.
-    </p>
+          <p>
+            Discover beautiful destinations, curated travel packages
+            and unforgettable experiences with Freefly Tourism & Travels.
+          </p>
 
-    <Button to="/destinations">
-      Explore More
-    </Button>
-  </div>
+          <Button to="/destinations">
+            Explore More
+          </Button>
+        </div>
 
-  <div className="hero-scroll">
-    <span>Scroll to discover</span>
-    <span className="scroll-line" />
-  </div>
-</section>
+        <div className="hero-scroll">
+          <span>Scroll to discover</span>
+          <span className="scroll-line" />
+        </div>
+      </section>
 
-      <section className="why-section">
-        <div className="container why-layout">
+      {/* ABOUT FREEFLY */}
+      <section className="home-about section">
+        <div className="container home-about-grid">
 
-          <div>
-            <SectionHeading
-              eyebrow="Why Freefly"
-              title="More than a ticket to somewhere."
-              copy="We believe the best trips feel personal before they even begin."
-              light
+          <div className="home-about-visual">
+            <img
+              className="home-about-main"
+              src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1000"
+              alt="Beautiful coastal travel destination"
             />
 
+            <img
+              className="home-about-small"
+              src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600"
+              alt="Scenic lake and mountain"
+            />
+
+            <span className="home-about-decoration">✳</span>
+          </div>
+
+          <div className="home-about-content">
+            <span className="home-kicker">
+              Welcome to Freefly
+            </span>
+
+            <h2>
+              Discover the World
+              <br />
+              <span>with Us</span>
+            </h2>
+
+            <p>
+              At Freefly Tourism & Travels, we believe travel is more
+              than visiting places. It's about creating memories,
+              discovering new cultures and experiencing something
+              unforgettable.
+            </p>
+
+            <p>
+              From peaceful hill stations to beautiful beaches and
+              cultural journeys, we help make every trip special
+              with carefully planned travel experiences.
+            </p>
+
             <Button to="/about">
-              Our approach
+              About Us
+            </Button>
+          </div>
+        </div>
+
+        <div className="container home-benefits">
+          {benefits.map(({ title, text, icon: Icon }) => (
+            <div className="home-benefit" key={title}>
+              <Icon size={32} strokeWidth={1.6} />
+              <strong>{title}</strong>
+              <p>{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FEATURED DESTINATION - EDITORIAL LAYOUT */}
+      <section className="home-featured section">
+        <div className="container home-featured-grid">
+
+          <div className="home-featured-content">
+            <span className="home-kicker">
+              Featured Destinations
+            </span>
+
+            <h2>
+              Amazing Places
+              <br />
+              Around the World
+            </h2>
+
+            <p>
+              From stunning beaches to majestic mountains, discover
+              beautiful places and unforgettable experiences.
+              Explore handpicked travel experiences with Freefly.
+            </p>
+
+            <Button to="/destinations">
+              View All Destinations
             </Button>
           </div>
 
-          <div className="benefits">
-
-  {[
-    {
-      title: "Reliable Service",
-      text: "We're with you from planning to boarding.",
-      icon: ShieldCheck
-    },
-    {
-      title: "Value Packages",
-      text: "Carefully curated itineraries for all interests.",
-      icon: BriefcaseBusiness
-    },
-    {
-      title: "Personalized Trips",
-      text: "Journeys tailored to your style.",
-      icon: MapPin
-    },
-    {
-      title: "Expert Assistance",
-      text: "Support that's just a call away.",
-      icon: Headphones
-    },
-    {
-      title: "Travel Support",
-      text: "Help at every step of your journey.",
-      icon: Plane
-    }
-  ].map(({ title, text, icon: Icon }) => (
-
-    <div className="benefit" key={title}>
-
-      <Icon className="benefit-icon" size={30} />
-
-      <strong>{title}</strong>
-
-      <p>{text}</p>
-
-    </div>
-
-  ))}
-
-</div>
+          <div className="home-featured-image">
+            <img
+              src="https://images.unsplash.com/photo-1505881502353-a1986add3762?w=1200"
+              alt="Beautiful tropical travel destination"
+            />
+          </div>
 
         </div>
       </section>
 
-      <section className="section review-section">
+      {/* WHY CHOOSE FREEFLY */}
+      <section className="home-why section">
+        <div className="container home-why-grid">
+          <div>
+            <span className="home-kicker">Why Choose Us</span>
+            <h2>
+              Travel with
+              <br />
+              <span>Confidence</span>
+            </h2>
+            <p>
+              We make your travel simple, comfortable and memorable
+              with reliable service and personalized assistance.
+            </p>
+          </div>
+
+          <div className="home-why-items">
+            {benefits.map(({ title, text, icon: Icon }) => (
+              <div className="home-why-item" key={title}>
+                <Icon size={30} />
+                <strong>{title}</strong>
+                <p>{text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TRAVEL GALLERY */}
+      <section className="home-gallery section">
         <div className="container">
+          <div className="home-gallery-heading">
+            <span className="home-kicker">Our Gallery</span>
+            <h2>Explore Our Best Moments</h2>
+            <p>
+              A glimpse of beautiful places and unforgettable
+              travel experiences.
+            </p>
+          </div>
 
-          <SectionHeading
-            eyebrow="Traveller stories"
-            title="Stories from the road"
-          />
-
-          <div className="reviews">
-
-  {[
-    [
-      'Maya Thompson',
-      'New York',
-      'Freefly made our honeymoon feel effortless. Every detail was considered, but it still felt completely ours.'
-    ],
-    [
-      'Arjun Mehta',
-      'London',
-      'The kind of support you hope for when you are far from home. Calm, quick, and genuinely human.'
-    ],
-    [
-      'Sofia Martinez',
-      'Barcelona',
-      'Our family trip had something for everyone. We came home with stories instead of a checklist.'
-    ]
-  ].map(([name, location, review]) => (
-
-    <article className="review-card" key={name}>
-
-      <div className="stars">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            size={14}
-            fill="currentColor"
-          />
-        ))}
-      </div>
-
-      <p>“{review}”</p>
-
-      <div className="review-person">
-        <div className="review-avatar">
-          {name.charAt(0)}
-        </div>
-
-        <div>
-          <strong>{name}</strong>
-          <span>{location}</span>
-        </div>
-      </div>
-
-    </article>
-
-  ))}
-
-</div>
-
+          <div className="home-gallery-grid">
+            {galleryImages.map((item, index) => (
+              <div className="home-gallery-item" key={item.alt}>
+                <img src={item.src} alt={item.alt} loading="lazy" />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="section gallery-section">
-  <div className="container">
-
-    <div className="heading-row">
-
-      <SectionHeading
-        eyebrow="Travel Moments"
-        title="Postcards from elsewhere"
-        copy="A few places that stayed with us long after the journey ended."
-      />
-
-      <Button to="/about" secondary>
-        View travel moments
-      </Button>
-
-    </div>
-
-    <GalleryGrid linkTo="/about" />
-
-  </div>
-</section>
-
+      {/* EXISTING CTA */}
       <CTA />
 
     </main>
-  )
+  );
 }
 
 function PageHero({ eyebrow, title, copy, image }) {
@@ -611,14 +817,26 @@ function PageHero({ eyebrow, title, copy, image }) {
         {copy && <p>{copy}</p>}
       </div>
     </section>
-  )
+  );
 }
 
+
 function About() {
+  const services = [
+    "Domestic Tour Packages",
+    "Weekend Getaways",
+    "Group Tours & Adventures",
+    "Family Holiday Packages",
+    "Sightseeing & Local Tours",
+    "Transportation Arrangements",
+    "Accommodation & Travel Planning",
+    "Customised Tour Packages",
+  ];
+
   return (
     <main className="about-page">
 
-      {/* HERO */}
+      {/* EXISTING HERO - KEEP UNCHANGED */}
 
       <PageHero
         eyebrow="Our story"
@@ -627,331 +845,114 @@ function About() {
         image={aboutHero}
       />
 
-
-      {/* ABOUT INTRO */}
+      {/* ABOUT FREEFLY */}
 
       <section className="section about-intro">
         <div className="container split">
 
-          <img
-            src={destinations[3].image}
-            alt="Beautiful travel destination"
-          />
-
-          <div>
-
-            <SectionHeading
-              eyebrow="About Freefly"
-              title="A travel studio for open-minded people."
-              copy="We bring together the practical and the poetic parts of travel. From a simple city break to a once-in-a-lifetime escape, we make the details feel easy so you can stay present."
+          <div className="about-image-grid">
+            <img
+              src={destinations[3].image}
+              alt="Beautiful travel destination"
+              className="about-image-main"
             />
 
-            <div className="about-points">
+            <img
+              src={destinations[4].image}
+              alt="Scenic travel destination"
+              className="about-image-secondary"
+            />
+          </div>
 
-              <div>
-                <strong>01</strong>
-                <span>We Listen</span>
-              </div>
+          <div className="about-content">
+            <SectionHeading
+              eyebrow="About Us"
+              title="FreeFly Tourism & Travels"
+              copy="FreeFly Tourism & Travels is a travel and tourism company dedicated to creating memorable travel experiences through well-planned trips, exciting destinations and comfortable travel arrangements."
+            />
 
-              <div>
-                <strong>02</strong>
-                <span>We Plan</span>
-              </div>
+            <p>
+              We believe travelling is more than just visiting
+              places — it is about discovering new experiences,
+              connecting with people and creating memories that
+              last a lifetime.
+            </p>
 
-              <div>
-                <strong>03</strong>
-                <span>You Explore</span>
-              </div>
+            <p>
+              From refreshing weekend getaways and group trips
+              to family vacations and customised travel packages,
+              we aim to make every journey enjoyable, convenient
+              and hassle-free.
+            </p>
 
-            </div>
-
+            <p>
+              With a focus on customer satisfaction, reliable
+              travel arrangements and carefully planned
+              itineraries, FreeFly Tourism & Travels brings
+              people closer to the destinations they dream
+              of exploring.
+            </p>
           </div>
 
         </div>
       </section>
 
+      {/* BUSINESS DESCRIPTION & SERVICES */}
 
-      {/* STATS */}
+      <section className="section about-services-section">
+        <div className="container">
 
-      <section className="stats-section">
-        <div className="container stats">
-
-          <div>
-            <strong>42</strong>
-            <span>Countries explored</span>
+          <div className="about-services-heading">
+            <SectionHeading
+              eyebrow="Our Business"
+              title="Travel experiences made simple."
+              copy="FreeFly Tourism & Travels offers travel planning and tourism services designed for individuals, families, friends and groups. We organise domestic tour packages, weekend trips, sightseeing tours, group adventures and customised holiday experiences."
+            />
           </div>
 
-          <div>
-            <strong>8k+</strong>
-            <span>Happy travellers</span>
-          </div>
+          <div className="about-services-grid">
+            {services.map((service, index) => (
+              <div className="about-service-card" key={service}>
+                <span className="service-number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
 
-          <div>
-            <strong>12</strong>
-            <span>Years of know-how</span>
-          </div>
+                <h3>{service}</h3>
 
-          <div>
-            <strong>4.9</strong>
-            <span>Average guest rating</span>
+                <span className="service-arrow">↗</span>
+              </div>
+            ))}
           </div>
 
         </div>
       </section>
 
+      {/* BRAND TAGLINE */}
 
-      {/* MISSION + VISION */}
+      <section className="about-brand-message">
+        <div className="container">
+          <span className="eyebrow">Your Journey Starts Here</span>
 
-      <section className="section mission-vision-section">
-        <div className="container mission-vision-grid">
-
-          <div className="mission-vision-content">
-
-            <div className="mission-block">
-
-              <span className="eyebrow">
-                Our Mission
-              </span>
-
-              <h2>
-                Make the world
-                <br />
-                feel closer.
-              </h2>
-
-              <p>
-                We design journeys that are better for your time,
-                your budget, and your curiosity. That means honest
-                recommendations, warm support, and itineraries with
-                a point of view.
-              </p>
-
-            </div>
-
-
-            <div className="mission-block">
-
-              <span className="eyebrow">
-                Our Vision
-              </span>
-
-              <h2>
-                A more thoughtful
-                <br />
-                way to roam.
-              </h2>
-
-              <p>
-                More connection. Less rushing. Travel that leaves
-                you with a fuller sense of the place and the people
-                who make it special.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <img
-            src={destinations[4].image}
-            alt="Travel destination"
-            className="mission-image"
-          />
-
+          <h2>
+            Explore More.
+            <br />
+            Travel Freely.
+            <br />
+            Create Memories.
+          </h2>
         </div>
       </section>
 
-
-      {/* TRAVEL MOMENTS - GALLERY MOVED HERE */}
-
-      <section className="journey-section">
-  <div className="container journey-container">
-
-    {/* TOP CONTENT */}
-
-    <div className="journey-header">
-
-      <div className="journey-title">
-
-        <span className="eyebrow">
-          HOW WE WORK
-        </span>
-
-        <h2>
-          Every great journey
-          <br />
-          starts with a
-          <br />
-
-          <span>conversation.</span>
-        </h2>
-
-        <p>
-          From your first idea to the moment you return home,
-          we make travel planning simple, personal, and memorable.
-        </p>
-
-      </div>
-
-
-      {/* DECORATIVE RIGHT SIDE */}
-
-      <div className="journey-decoration">
-
-        <div className="flight-path"></div>
-
-        <Plane className="flight-plane" />
-
-        <div className="mountains">
-          <div className="mountain mountain-one"></div>
-          <div className="mountain mountain-two"></div>
-          <div className="mountain mountain-three"></div>
-        </div>
-
-        <div className="location-glow">
-          <MapPin />
-        </div>
-
-      </div>
-
-    </div>
-
-
-    {/* JOURNEY CARDS */}
-
-    <div className="journey-steps">
-
-      {/* STEP 1 */}
-
-      <article className="journey-card">
-
-        <span className="step-number">
-          01
-        </span>
-
-        <div className="journey-icon">
-          <MessageCircle />
-        </div>
-
-        <h3>
-          Tell Us Your Dream
-        </h3>
-
-        <p>
-          Tell us where you want to go, what you love,
-          and the kind of experience you are looking for.
-        </p>
-
-        <span className="card-line"></span>
-
-      </article>
-
-
-      <div className="step-arrow">
-        <ChevronRight />
-      </div>
-
-
-      {/* STEP 2 */}
-
-      <article className="journey-card">
-
-        <span className="step-number">
-          02
-        </span>
-
-        <div className="journey-icon">
-          <Map />
-        </div>
-
-        <h3>
-          We Shape the Journey
-        </h3>
-
-        <p>
-          We carefully create a travel plan around
-          your interests, time, and budget.
-        </p>
-
-        <span className="card-line"></span>
-
-      </article>
-
-
-      <div className="step-arrow">
-        <ChevronRight />
-      </div>
-
-
-      {/* STEP 3 */}
-
-      <article className="journey-card">
-
-        <span className="step-number">
-          03
-        </span>
-
-        <div className="journey-icon">
-          <Luggage />
-        </div>
-
-        <h3>
-          We Take Care of Details
-        </h3>
-
-        <p>
-          From stays and transport to experiences,
-          we help make every detail feel easier.
-        </p>
-
-        <span className="card-line"></span>
-
-      </article>
-
-
-      <div className="step-arrow">
-        <ChevronRight />
-      </div>
-
-
-      {/* STEP 4 */}
-
-      <article className="journey-card">
-
-        <span className="step-number">
-          04
-        </span>
-
-        <div className="journey-icon">
-          <Plane />
-        </div>
-
-        <h3>
-          You Explore Freely
-        </h3>
-
-        <p>
-          All that's left is to enjoy the journey,
-          discover new places, and make memories.
-        </p>
-
-        <span className="card-line"></span>
-
-      </article>
-
-    </div>
-
-  </div>
-</section>
-
-
-      {/* CTA */}
+      {/* EXISTING CTA */}
 
       <CTA />
 
     </main>
-  )
+  );
 }
+ 
+
+
 
 function Destinations() {
   const [query, setQuery] = useState('')
@@ -1126,9 +1127,10 @@ function Packages() {
     </main>
   )
 }
+
 function Services() {
   return (
-    <main>
+    <main className="services-page">
 
       <PageHero
         eyebrow="Make it easy"
@@ -1137,15 +1139,108 @@ function Services() {
         image={servicesHero}
       />
 
-      <section className="simple-section">
+      <section className="services-main-section">
         <div className="container">
+          <div className="services-world-intro">
+            <span>THE WORLD OF FREEFLY</span>
+            <h2>
+              One Travel Partner. <em>Endless Possibilities.</em>
+            </h2>
+            <p>
+              Whether you are planning a family holiday, an international
+              adventure, a business trip or a relaxing weekend escape,
+              Freefly helps bring your travel plans together.
+            </p>
+          </div>
+
           <ServiceCards />
         </div>
       </section>
 
+      <section className="services-benefits">
+        <div className="container services-benefits-inner">
+          <div className="services-benefits-title">
+            <span>WHY TRAVEL WITH US</span>
+            <h2>
+              More Than Bookings.
+              <em> We Create Experiences.</em>
+            </h2>
+          </div>
+
+          <div className="services-benefit">
+            <span>01</span>
+            <h3>Personalised Planning</h3>
+            <p>Travel arrangements designed around your preferences and budget.</p>
+          </div>
+
+          <div className="services-benefit">
+            <span>02</span>
+            <h3>Multiple Travel Options</h3>
+            <p>Tour packages, reservations and travel assistance in one place.</p>
+          </div>
+
+          <div className="services-benefit">
+            <span>03</span>
+            <h3>Dedicated Assistance</h3>
+            <p>Guidance to help you plan and organise your travel.</p>
+          </div>
+
+          <div className="services-benefit">
+            <span>04</span>
+            <h3>Memorable Experiences</h3>
+            <p>Thoughtfully planned journeys to make every trip special.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="services-process">
+        <div className="container">
+
+          <div className="services-process-heading">
+            <div>
+              <span>SIMPLE & CONVENIENT</span>
+              <h2>Your Journey, Made Simple.</h2>
+            </div>
+
+            <p>
+              From your first enquiry to your final destination,
+              we make travel planning easy.
+            </p>
+          </div>
+
+          <div className="services-process-grid">
+            <div className="services-process-card">
+              <span>01</span>
+              <h3>Share Your Plan</h3>
+              <p>Tell us about your destination, dates and travel preferences.</p>
+            </div>
+
+            <div className="services-process-card">
+              <span>02</span>
+              <h3>Get Your Itinerary</h3>
+              <p>Receive a travel plan designed around your requirements.</p>
+            </div>
+
+            <div className="services-process-card">
+              <span>03</span>
+              <h3>Confirm Your Booking</h3>
+              <p>Finalise your travel arrangements and reservations.</p>
+            </div>
+
+            <div className="services-process-card">
+              <span>04</span>
+              <h3>Enjoy Your Journey</h3>
+              <p>Get ready to explore and create unforgettable memories.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
     </main>
-  )
+  );
 }
+
 
 function Gallery() {
   const [selected, setSelected] = useState(null)
@@ -1409,6 +1504,8 @@ function Contact() {
   )
 }
 function AppContent() {
+  useScrollReveal();
+
   const location = useLocation();
 
   const isAdminPage = location.pathname.startsWith("/admin");
@@ -1454,6 +1551,11 @@ function AppContent() {
            <ProtectedAdminRoute>
                 <AdminPackages />
              </ProtectedAdminRoute>
+} />
+<Route path="/admin/services" element={
+    <ProtectedAdminRoute>
+        <AdminServices />
+    </ProtectedAdminRoute>
 } />
         {/* Wildcard must be last */}
         <Route path="*" element={<Home />} />

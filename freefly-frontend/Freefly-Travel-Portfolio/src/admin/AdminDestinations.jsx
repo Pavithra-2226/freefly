@@ -2,6 +2,129 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const TAMIL_NADU_DESTINATIONS = [
+        {
+          name: "Ooty",
+          country: "India",
+          category: "Hill Station",
+          description: "Discover Ooty, the Queen of the Nilgiris, where rolling tea gardens, mist-covered mountains and peaceful lakes create a refreshing hill-station escape. Explore scenic viewpoints, beautifully maintained gardens and the charm of the Nilgiri Mountain Railway.",
+          image: "https://static.toiimg.com/thumb/msid-91006682%2Cwidth-748%2Cheight-499%2Cresizemode%3D4%2Cimgsize-166634/Ooty-Tamil-Nadu.jpg",
+          best_time_to_visit: "October to June",
+          places: [
+            { name: "Doddabetta Peak", image: "https://upload.wikimedia.org/wikipedia/commons/2/26/Ooty_-_Tea_plantation%2C_Doddabetta_Tamil_Nadu%2C_India.jpg", description: "Enjoy sweeping views of the Nilgiri hills from one of the region's best-known viewpoints." },
+            { name: "Ooty Lake", image: "https://ttdconline.com/assets/img/boathouse/ooty/list/ooty-bh-0.png", description: "Spend a relaxing afternoon beside the lake or enjoy a boat ride surrounded by green hills." },
+            { name: "Government Botanical Garden", image: "https://www.travel2ooty.com/pageimages/Botanical-Garden.jpg", description: "Explore colourful flower beds, lawns and tree-lined walking paths in this historic garden." }
+          ],
+          things_to_do: [
+            { name: "Ride the Nilgiri Mountain Railway", image: "https://images.herzindagi.info/image/2023/Dec/ooty-the-archies.jpg", description: "Take a memorable toy-train journey through tunnels, bridges and beautiful mountain scenery." },
+            { name: "Explore the Tea Gardens", image: "https://travel2ooty.s3.ap-south-1.amazonaws.com/tea-garden-hero.webp", description: "Walk through lush tea estates and enjoy the cool mountain air and plantation views." },
+            { name: "Enjoy Lake Boating", image: "https://upload.wikimedia.org/wikipedia/commons/3/37/Honeymoon_Boathouse_ooty.jpg", description: "Enjoy a peaceful boating experience at the popular Ooty Lake." }
+          ],
+          gallery: ["https://upload.wikimedia.org/wikipedia/commons/2/26/Ooty_-_Tea_plantation%2C_Doddabetta_Tamil_Nadu%2C_India.jpg", "https://ttdconline.com/assets/img/boathouse/ooty/list/ooty-bh-0.png", "https://www.travel2ooty.com/pageimages/Botanical-Garden.jpg"],
+          status: "active"
+        },
+        {
+          name: "Kodaikanal",
+          country: "India",
+          category: "Hill Station",
+          description: "Escape to Kodaikanal, the Princess of Hill Stations, known for its cool climate, wooded slopes, scenic valleys and the star-shaped Kodai Lake. Enjoy peaceful nature walks, viewpoints and waterfalls in the Palani Hills.",
+          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20Lake%2C%20Tamil%20Nadu.jpg",
+          best_time_to_visit: "April to June and September to October",
+          places: [
+            { name: "Kodaikanal Lake", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20Lake%2C%20Tamil%20Nadu.jpg", description: "Walk or cycle around the star-shaped lake, or enjoy boating in the heart of Kodaikanal." },
+            { name: "Coaker's Walk", image: "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Kodaikanal%20lake%2C%20Tamil%20Nadu%20India.jpg", description: "Take a scenic stroll along this mountain pathway with wide views over the valleys." },
+            { name: "Pillar Rocks", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20hill%20and%20lake.jpeg", description: "See the striking granite pillars rising above the green valley and forest landscape." }
+          ],
+          things_to_do: [
+            { name: "Go Boating", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20Lake%2C%20Tamil%20Nadu.jpg", description: "Enjoy a relaxing boat ride and admire the hills around Kodai Lake." },
+            { name: "Walk Through Pine Forest", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20hill%20and%20lake.jpeg", description: "Explore the tall pine trees and peaceful forest paths that make Kodaikanal special." },
+            { name: "Visit Scenic Viewpoints", image: "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Kodaikanal%20lake%2C%20Tamil%20Nadu%20India.jpg", description: "Stop at viewpoints for misty valley scenery and memorable photographs." }
+          ],
+          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20Lake%2C%20Tamil%20Nadu.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Kodaikanal%20lake%2C%20Tamil%20Nadu%20India.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20hill%20and%20lake.jpeg"],
+          status: "active"
+        },
+        {
+          name: "Madurai",
+          country: "India",
+          category: "Heritage",
+          description: "Experience Madurai, one of Tamil Nadu's historic cultural centres. The city is celebrated for the magnificent Meenakshi Amman Temple, lively traditional markets, distinctive architecture and its rich food and festival culture.",
+          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg",
+          best_time_to_visit: "October to March",
+          places: [
+            { name: "Meenakshi Amman Temple", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", description: "Admire the famous temple complex, its colourful towers and detailed Dravidian architecture." },
+            { name: "Thirumalai Nayakkar Palace", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Madurai%20Meenakshi%20Amman%20Temple.JPG", description: "Discover the grand pillars and historic architecture of this 17th-century palace." },
+            { name: "Gandhi Memorial Museum", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", description: "Learn about India's freedom movement through exhibits and historical displays." }
+          ],
+          things_to_do: [
+            { name: "Explore the Temple Streets", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", description: "Walk around the temple streets and browse traditional shops and local markets." },
+            { name: "Taste Madurai Cuisine", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Madurai%20Meenakshi%20Amman%20Temple.JPG", description: "Try local favourites and experience the city's lively food culture." },
+            { name: "Discover Heritage Architecture", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", description: "Spend time exploring the city's historic buildings and distinctive temple architecture." }
+          ],
+          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Madurai%20Meenakshi%20Amman%20Temple.JPG"],
+          status: "active"
+        },
+        {
+          name: "Rameswaram",
+          country: "India",
+          category: "Temple",
+          description: "Visit Rameswaram, a beautiful island destination known for its sacred Ramanathaswamy Temple, long temple corridors, coastal landscapes and the iconic Pamban Bridge. It offers a memorable blend of spirituality, history and seaside scenery.",
+          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20pamban%20bridge.jpg",
+          best_time_to_visit: "October to April",
+          places: [
+            { name: "Ramanathaswamy Temple", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20pamban%20bridge.jpg", description: "Visit the renowned temple, known for its long pillared corridors and sacred significance." },
+            { name: "Pamban Bridge", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20bridge%20Pamban%20bridge.jpg", description: "See the famous bridge connecting the island region with mainland Tamil Nadu." },
+            { name: "Dhanushkodi", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Pamban%20Bridge%2C%20Rameswaram.jpg", description: "Explore the dramatic coastal landscape and the remains of the old settlement at the island's tip." }
+          ],
+          things_to_do: [
+            { name: "Explore the Temple Corridors", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20pamban%20bridge.jpg", description: "Experience the architecture and atmosphere of the famous Ramanathaswamy Temple." },
+            { name: "Visit Dhanushkodi Beach", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Pamban%20Bridge%2C%20Rameswaram.jpg", description: "Enjoy the sea views and unique coastal setting at Dhanushkodi." },
+            { name: "View Pamban Bridge", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20bridge%20Pamban%20bridge.jpg", description: "Take in the striking sea-bridge views and photograph this famous landmark." }
+          ],
+          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20pamban%20bridge.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20bridge%20Pamban%20bridge.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Pamban%20Bridge%2C%20Rameswaram.jpg"],
+          status: "active"
+        },
+        {
+          name: "Kanyakumari",
+          country: "India",
+          category: "Beach",
+          description: "Discover Kanyakumari at the southern tip of mainland India, where the Arabian Sea, Bay of Bengal and Indian Ocean meet. The destination is loved for its sunrise and sunset views, Vivekananda Rock Memorial and coastal atmosphere.",
+          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari.jpg",
+          best_time_to_visit: "October to March",
+          places: [
+            { name: "Vivekananda Rock Memorial", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari.jpg", description: "Take a ferry to the memorial on the rock and enjoy the panoramic ocean setting." },
+            { name: "Thiruvalluvar Statue", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu%2C%20India.jpg", description: "See the monumental statue honouring the celebrated Tamil poet and philosopher Thiruvalluvar." },
+            { name: "Kanyakumari Beach", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu.jpg", description: "Enjoy the coastal views and the famous sunrise and sunset atmosphere." }
+          ],
+          things_to_do: [
+            { name: "Watch the Sunrise", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari.jpg", description: "Start the day by watching the sun rise over the ocean horizon." },
+            { name: "Take a Ferry Ride", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu%2C%20India.jpg", description: "Travel by ferry to visit the offshore memorial and enjoy the sea views." },
+            { name: "Explore the Seafront", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu.jpg", description: "Walk along the waterfront and enjoy the distinctive southern coastal scenery." }
+          ],
+          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu%2C%20India.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu.jpg"],
+          status: "active"
+        },
+        {
+          name: "Mahabalipuram",
+          country: "India",
+          category: "Heritage",
+          description: "Explore Mahabalipuram, a coastal heritage town famous for its Pallava-era rock-cut monuments, carved stone temples and Shore Temple overlooking the Bay of Bengal. It is an excellent destination for history, architecture and seaside visits.",
+          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%2C%20Mahabalipuram%2C%20Tamil%20Nadu.jpg",
+          best_time_to_visit: "November to February",
+          places: [
+            { name: "Shore Temple", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%2C%20Mahabalipuram%2C%20Tamil%20Nadu.jpg", description: "Visit the landmark granite temple standing beside the Bay of Bengal." },
+            { name: "Pancha Rathas", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%20at%20Mahabalipuram%20Tamilnadu.jpg", description: "Discover the remarkable group of monolithic rock-cut monuments carved from single stones." },
+            { name: "Arjuna's Penance", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mahabalipuram%20Shore%20Temple.jpg", description: "Admire the enormous open-air rock relief filled with detailed sculptural scenes." }
+          ],
+          things_to_do: [
+            { name: "Explore the Shore Temple", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%2C%20Mahabalipuram%2C%20Tamil%20Nadu.jpg", description: "Walk around the historic temple complex and enjoy its coastal setting." },
+            { name: "Discover the Stone Carvings", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%20at%20Mahabalipuram%20Tamilnadu.jpg", description: "Look closely at the detailed carvings and ancient rock-cut architecture." },
+            { name: "Relax by the Beach", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mahabalipuram%20Shore%20Temple.jpg", description: "Spend some time along the coast after exploring the heritage monuments." }
+          ],
+          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%2C%20Mahabalipuram%2C%20Tamil%20Nadu.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%20at%20Mahabalipuram%20Tamilnadu.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Mahabalipuram%20Shore%20Temple.jpg"],
+          status: "active"
+        }
+      ];
+
 function AdminDestinations() {
   const navigate = useNavigate();
 
@@ -12,7 +135,7 @@ function AdminDestinations() {
 
   const initialFormData = {
     name: "",
-    country: "",
+    country: "India",
     category: "",
     description: "",
     image: "",
@@ -41,7 +164,6 @@ function AdminDestinations() {
   const fetchDestinations = async () => {
     try {
       setLoading(true);
-
       const token = localStorage.getItem("admin_token");
 
       if (!token) {
@@ -53,23 +175,90 @@ function AdminDestinations() {
         "http://127.0.0.1:8000/api/admin/destinations",
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.detail || "Failed to load destinations"
-        );
+        throw new Error(data.detail || "Failed to load destinations");
       }
 
       setDestinations(data);
     } catch (error) {
       console.error("Destination error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Replace all existing destination records with the six curated Tamil Nadu destinations.
+  const handleReplaceWithTamilNadu = async () => {
+    const confirmed = window.confirm(
+      "This will permanently delete ALL existing destinations and replace them with Ooty, Kodaikanal, Madurai, Rameswaram, Kanyakumari and Mahabalipuram. Continue?"
+    );
+    if (!confirmed) return;
+
+    const token = localStorage.getItem("admin_token");
+    if (!token) {
+      alert("Please login again.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const currentResponse = await fetch(
+        "http://127.0.0.1:8000/api/admin/destinations",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const currentItems = await currentResponse.json();
+
+      if (!currentResponse.ok) {
+        throw new Error(currentItems.detail || "Could not load existing destinations.");
+      }
+
+      for (const item of currentItems) {
+        const deleteResponse = await fetch(
+          `http://127.0.0.1:8000/api/admin/destinations/${item.id}`,
+          {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (!deleteResponse.ok) {
+          const errorData = await deleteResponse.json();
+          throw new Error(errorData.detail || `Could not delete ${item.name}.`);
+        }
+      }
+
+      const createdItems = [];
+      for (const destination of TAMIL_NADU_DESTINATIONS) {
+        const createResponse = await fetch(
+          "http://127.0.0.1:8000/api/admin/destinations",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(destination),
+          }
+        );
+        const created = await createResponse.json();
+        if (!createResponse.ok) {
+          throw new Error(created.detail || `Could not create ${destination.name}.`);
+        }
+        createdItems.push(created);
+      }
+
+      setDestinations(createdItems);
+      alert("Successfully replaced your destination list with six Tamil Nadu destinations.");
+    } catch (error) {
+      console.error("Destination reset error:", error);
+      alert(error.message || "Could not replace destinations.");
+      await fetchDestinations();
     } finally {
       setLoading(false);
     }
@@ -565,20 +754,31 @@ function AdminDestinations() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                className="ff-primary-btn"
-                onClick={() => {
-                  if (showForm) {
-                    handleCloseForm();
-                  } else {
-                    resetForm();
-                    setShowForm(true);
-                  }
-                }}
-              >
-                {showForm ? "✕ Close Form" : "+ Add Destination"}
-              </button>
+              <div className="ff-destination-heading-actions" style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  className="ff-outline-btn"
+                  onClick={handleReplaceWithTamilNadu}
+                  disabled={loading}
+                  title="Deletes all existing destinations and loads the six prepared Tamil Nadu destinations"
+                >
+                  Replace All with 6 Tamil Nadu Places
+                </button>
+                <button
+                  type="button"
+                  className="ff-primary-btn"
+                  onClick={() => {
+                    if (showForm) {
+                      handleCloseForm();
+                    } else {
+                      resetForm();
+                      setShowForm(true);
+                    }
+                  }}
+                >
+                  {showForm ? "✕ Close Form" : "+ Add Destination"}
+                </button>
+              </div>
             </div>
 
             {/* ADD / EDIT FORM */}
@@ -621,14 +821,14 @@ function AdminDestinations() {
                       {renderInput(
                         "Destination Name",
                         "name",
-                        "Example: Paris",
+                        "Example: Ooty",
                         true
                       )}
 
                       {renderInput(
                         "Country",
                         "country",
-                        "Example: France",
+                        "Example: India",
                         true
                       )}
 
@@ -641,11 +841,13 @@ function AdminDestinations() {
                           required
                         >
                           <option value="">Select Category</option>
-                          <option value="International">International</option>
-                          <option value="India">India</option>
+                          <option value="Hill Station">Hill Station</option>
                           <option value="Beach">Beach</option>
+                          <option value="Heritage">Heritage</option>
+                          <option value="Temple">Temple</option>
+                          <option value="Nature">Nature</option>
                           <option value="Adventure">Adventure</option>
-                          <option value="Honeymoon">Honeymoon</option>
+                          <option value="Wildlife">Wildlife</option>
                         </select>
                       </div>
 

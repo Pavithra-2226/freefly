@@ -39,8 +39,7 @@ function AdminDashboard() {
     { name: "Destinations", icon: "⌖", path: "/admin/destinations" },
     { name: "Packages", icon: "▣", path: "/admin/packages" },
     { name: "Enquiries", icon: "✉", path: "/admin/enquiries" },
-    { name: "Offers", icon: "◇", path: "/admin/offers" },
-  ];
+{ name: "Services", icon: "◇", path: "/admin/services" },  ];
 
   const fetchDashboardData = async () => {
     const token = localStorage.getItem("admin_token");
