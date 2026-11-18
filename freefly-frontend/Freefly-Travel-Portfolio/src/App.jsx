@@ -16,7 +16,11 @@ import AdminPackages from "./admin/AdminPackages";
 import DestinationDetails from "./DestinationDetails";
 import PackageDetails from "./PackageDetails";
 import AdminEnquiries from "./admin/AdminEnquiries";
+import AdminHomePage from "./admin/AdminHomePage";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+gsap.registerPlugin(ScrollTrigger);
 import {
   BrowserRouter,
   Link,
@@ -120,6 +124,366 @@ function Navbar() {
       </nav>
     </header>
   )
+}
+
+
+function Home() {
+  const [homepage, setHomepage] = useState({
+    banners: [],
+    postcards: []
+  });
+
+  const heroRef = useRef(null);
+  const heroImageRef = useRef(null);
+  const heroContentRef = useRef(null);
+  const galleryRef = useRef(null);
+
+  // Load homepage content from CMS
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/homepage")
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Unable to load homepage.");
+        }
+        return response.json();
+      })
+      .then(data => {
+        setHomepage({
+          banners: data.banners || [],
+          postcards: data.postcards || []
+        });
+      })
+      .catch(error => {
+        console.error("Homepage loading error:", error);
+      });
+  }, []);
+
+  const activeBanner = homepage.banners[0];
+
+  // Hero and promotional card animations
+  useEffect(() => {
+    const hero = heroRef.current;
+
+    if (!hero) return;
+
+    const image = heroImageRef.current;
+    const content = heroContentRef.current;
+    const gallery = galleryRef.current;
+
+    const mediaQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    const reducedMotion = mediaQuery.matches;
+
+    const ctx = gsap.context(() => {
+      if (reducedMotion) return;
+
+      // HERO IMAGE 3D ENTRANCE
+      if (image) {
+        gsap.fromTo(
+          image,
+          {
+            opacity: 0,
+            scale: 1.08,
+            rotationY: -7,
+            rotationX: 3,
+            z: -100
+          },
+          {
+            opacity: 1,
+            scale: 1,
+            rotationY: 0,
+            rotationX: 0,
+            z: 0,
+            duration: 2,
+            ease: "power3.out"
+          }
+        );
+      }
+
+      // HERO TEXT ANIMATION
+      if (content) {
+        gsap.fromTo(
+          content.children,
+          {
+            opacity: 0,
+            y: 45
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1.1,
+            stagger: 0.18,
+            delay: 0.4,
+            ease: "power3.out"
+          }
+        );
+      }
+
+      // GALLERY CARD SCROLL REVEAL
+      if (gallery) {
+        const cards = gallery.querySelectorAll(
+          ".ff-home-gallery-item"
+        );
+
+        gsap.fromTo(
+          cards,
+          {
+            opacity: 0,
+            y: 65,
+            rotationX: 9,
+            scale: 0.96
+          },
+          {
+            opacity: 1,
+            y: 0,
+            rotationX: 0,
+            scale: 1,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: gallery,
+              start: "top 80%",
+              once: true
+            }
+          }
+        );
+      }
+    }, hero);
+
+    // MOUSE RESPONSIVE 3D HERO
+    const handleMouseMove = event => {
+      if (
+        reducedMotion ||
+        !image ||
+        window.innerWidth < 768
+      ) {
+        return;
+      }
+
+      const bounds = hero.getBoundingClientRect();
+
+      const x =
+        (event.clientX - bounds.left) / bounds.width - 0.5;
+
+      const y =
+        (event.clientY - bounds.top) / bounds.height - 0.5;
+
+      gsap.to(image, {
+        rotationY: x * 6,
+        rotationX: y * -5,
+        x: x * -15,
+        y: y * -12,
+        duration: 0.8,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    };
+
+    const handleMouseLeave = () => {
+      if (!image || reducedMotion) return;
+
+      gsap.to(image, {
+        rotationY: 0,
+        rotationX: 0,
+        x: 0,
+        y: 0,
+        duration: 1,
+        ease: "power3.out"
+      });
+    };
+
+    hero.addEventListener("mousemove", handleMouseMove);
+    hero.addEventListener("mouseleave", handleMouseLeave);
+
+    // CLEANUP
+    return () => {
+      hero.removeEventListener("mousemove", handleMouseMove);
+      hero.removeEventListener("mouseleave", handleMouseLeave);
+
+      ctx.revert();
+    };
+  }, [homepage]);
+
+  // Promotional card 3D hover animation
+  useEffect(() => {
+    const gallery = galleryRef.current;
+
+    if (!gallery || window.innerWidth < 768) return;
+
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    const cards = gallery.querySelectorAll(
+      ".ff-home-gallery-item"
+    );
+
+    const cleanups = [];
+
+    cards.forEach(card => {
+      const handleMove = event => {
+        const bounds = card.getBoundingClientRect();
+
+        const x =
+          (event.clientX - bounds.left) / bounds.width - 0.5;
+
+        const y =
+          (event.clientY - bounds.top) / bounds.height - 0.5;
+
+        gsap.to(card, {
+          rotationY: x * 7,
+          rotationX: y * -7,
+          y: -7,
+          duration: 0.45,
+          ease: "power2.out"
+        });
+      };
+
+      const handleLeave = () => {
+        gsap.to(card, {
+          rotationY: 0,
+          rotationX: 0,
+          y: 0,
+          duration: 0.7,
+          ease: "power3.out"
+        });
+      };
+
+      card.addEventListener("mousemove", handleMove);
+      card.addEventListener("mouseleave", handleLeave);
+
+      cleanups.push(() => {
+        card.removeEventListener("mousemove", handleMove);
+        card.removeEventListener("mouseleave", handleLeave);
+      });
+    });
+
+    return () => {
+      cleanups.forEach(cleanup => cleanup());
+    };
+  }, [homepage.postcards]);
+
+  return (
+    <main>
+
+      {/* CINEMATIC 3D HERO BANNER */}
+
+      <section
+        className="hero ff-cinematic-hero"
+        ref={heroRef}
+      >
+        <div
+          className="ff-hero-image-layer"
+          ref={heroImageRef}
+          style={{
+            backgroundImage: activeBanner?.image
+              ? `url("${activeBanner.image}")`
+              : "none"
+          }}
+        />
+
+        <div className="ff-hero-shade" />
+
+        <div
+          className="container hero-content ff-hero-content"
+          ref={heroContentRef}
+        >
+          <span className="eyebrow">
+            {activeBanner?.subtitle ||
+              "Explore the world with Freefly"}
+          </span>
+
+          <h1>
+            {activeBanner?.title || (
+              <>
+                Your Journey
+                <br />
+                <em>Begins Here</em>
+              </>
+            )}
+          </h1>
+
+          <p>
+            {activeBanner?.description ||
+              "Discover beautiful destinations, curated travel packages and unforgettable experiences with Freefly Tourism & Travels."}
+          </p>
+
+          <Button
+            to={activeBanner?.button_link || "/destinations"}
+          >
+            {activeBanner?.button_text || "Explore More"}
+          </Button>
+        </div>
+
+        <div className="hero-scroll">
+          <span>Scroll to discover</span>
+          <span className="scroll-line" />
+        </div>
+      </section>
+
+      {/* DYNAMIC PROMOTIONAL GALLERY */}
+
+      
+{/* CONTINUOUS HORIZONTAL GALLERY */}
+
+{homepage.postcards.length > 0 && (
+  <section
+    className="ff-home-gallery"
+    ref={galleryRef}
+  >
+    <div className="ff-home-gallery-heading">
+      <span>EXPLORE THE WORLD</span>
+      <h2>Visit Our Gallery</h2>
+      <p>
+        Discover beautiful destinations and unforgettable moments.
+      </p>
+    </div>
+
+    <div className="ff-home-gallery-marquee">
+      <div className="ff-home-gallery-track">
+
+        {/* First set of images */}
+        {[0, 1].map((group) => (
+          <div
+            className="ff-home-gallery-group"
+            key={group}
+            aria-hidden={group === 1}
+          >
+            {homepage.postcards.map((item, index) => (
+              <div
+                className="ff-home-gallery-item"
+                key={`${group}-${item.id || index}`}
+              >
+                <img
+                  src={item.image}
+                  alt={item.title || "Freefly destination"}
+                  loading="lazy"
+                />
+
+                <div className="ff-gallery-card-caption">
+                  {item.title && <h3>{item.title}</h3>}
+                  {item.subtitle && <p>{item.subtitle}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+
+      </div>
+    </div>
+  </section>
+)}
+
+
+      {/* YOUR OTHER HOMEPAGE SECTIONS CAN BE ADDED HERE */}
+
+    </main>
+  );
 }
 
 function Footer() {
@@ -405,192 +769,6 @@ function CTA() {
   );
 }
 
-function Home() {
-  return (
-    <main>
-
-      <section className="hero">
-  <div className="hero-overlay" />
-
-  <div className="container hero-content">
-    <span className="eyebrow">
-      Explore the world with Freefly
-    </span>
-
-    <h1>
-      Your Journey
-      <br />
-      <em>Begins Here</em>
-    </h1>
-
-    <p>
-      Discover beautiful destinations, curated travel packages
-      and unforgettable experiences with Freefly Tourism & Travels.
-    </p>
-
-    <Button to="/destinations">
-      Explore More
-    </Button>
-  </div>
-
-  <div className="hero-scroll">
-    <span>Scroll to discover</span>
-    <span className="scroll-line" />
-  </div>
-</section>
-
-      <section className="why-section">
-        <div className="container why-layout">
-
-          <div>
-            <SectionHeading
-              eyebrow="Why Freefly"
-              title="More than a ticket to somewhere."
-              copy="We believe the best trips feel personal before they even begin."
-              light
-            />
-
-            <Button to="/about">
-              Our approach
-            </Button>
-          </div>
-
-          <div className="benefits">
-
-  {[
-    {
-      title: "Reliable Service",
-      text: "We're with you from planning to boarding.",
-      icon: ShieldCheck
-    },
-    {
-      title: "Value Packages",
-      text: "Carefully curated itineraries for all interests.",
-      icon: BriefcaseBusiness
-    },
-    {
-      title: "Personalized Trips",
-      text: "Journeys tailored to your style.",
-      icon: MapPin
-    },
-    {
-      title: "Expert Assistance",
-      text: "Support that's just a call away.",
-      icon: Headphones
-    },
-    {
-      title: "Travel Support",
-      text: "Help at every step of your journey.",
-      icon: Plane
-    }
-  ].map(({ title, text, icon: Icon }) => (
-
-    <div className="benefit" key={title}>
-
-      <Icon className="benefit-icon" size={30} />
-
-      <strong>{title}</strong>
-
-      <p>{text}</p>
-
-    </div>
-
-  ))}
-
-</div>
-
-        </div>
-      </section>
-
-      <section className="section review-section">
-        <div className="container">
-
-          <SectionHeading
-            eyebrow="Traveller stories"
-            title="Stories from the road"
-          />
-
-          <div className="reviews">
-
-  {[
-    [
-      'Maya Thompson',
-      'New York',
-      'Freefly made our honeymoon feel effortless. Every detail was considered, but it still felt completely ours.'
-    ],
-    [
-      'Arjun Mehta',
-      'London',
-      'The kind of support you hope for when you are far from home. Calm, quick, and genuinely human.'
-    ],
-    [
-      'Sofia Martinez',
-      'Barcelona',
-      'Our family trip had something for everyone. We came home with stories instead of a checklist.'
-    ]
-  ].map(([name, location, review]) => (
-
-    <article className="review-card" key={name}>
-
-      <div className="stars">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            size={14}
-            fill="currentColor"
-          />
-        ))}
-      </div>
-
-      <p>“{review}”</p>
-
-      <div className="review-person">
-        <div className="review-avatar">
-          {name.charAt(0)}
-        </div>
-
-        <div>
-          <strong>{name}</strong>
-          <span>{location}</span>
-        </div>
-      </div>
-
-    </article>
-
-  ))}
-
-</div>
-
-        </div>
-      </section>
-
-      <section className="section gallery-section">
-  <div className="container">
-
-    <div className="heading-row">
-
-      <SectionHeading
-        eyebrow="Travel Moments"
-        title="Postcards from elsewhere"
-        copy="A few places that stayed with us long after the journey ended."
-      />
-
-      <Button to="/about" secondary>
-        View travel moments
-      </Button>
-
-    </div>
-
-    <GalleryGrid linkTo="/about" />
-
-  </div>
-</section>
-
-      <CTA />
-
-    </main>
-  )
-}
 
 function PageHero({ eyebrow, title, copy, image }) {
   return (
@@ -1455,6 +1633,14 @@ function AppContent() {
                 <AdminPackages />
              </ProtectedAdminRoute>
 } />
+       <Route
+  path="/admin/homepage"
+  element={
+    <ProtectedAdminRoute>
+      <AdminHomePage />
+    </ProtectedAdminRoute>
+  }
+/>
         {/* Wildcard must be last */}
         <Route path="*" element={<Home />} />
       </Routes>

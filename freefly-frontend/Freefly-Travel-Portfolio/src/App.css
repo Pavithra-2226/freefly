@@ -7370,3 +7370,497 @@ button:hover,
     font-size: 9px;
   }
 }
+
+/* =================================
+   HOMEPAGE IMAGE GALLERY
+================================= */
+
+.ff-home-gallery {
+  width: 100%;
+  padding: 70px 5%;
+  background: #000;
+  box-sizing: border-box;
+}
+
+.ff-home-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  max-width: 1500px;
+  margin: auto;
+}
+
+.ff-home-gallery-item {
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.ff-home-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.ff-home-gallery-item:hover img {
+  transform: scale(1.06);
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+  .ff-home-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 550px) {
+  .ff-home-gallery {
+    padding: 35px 18px;
+  }
+
+  .ff-home-gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ff-home-gallery-item {
+    height: 260px;
+  }
+}
+
+/* =====================================
+   FREEFLY CINEMATIC 3D HERO
+===================================== */
+
+.ff-cinematic-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  perspective: 1400px;
+  background: #050b14;
+}
+
+.ff-hero-image-layer {
+  position: absolute;
+  inset: -3%;
+  z-index: -2;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  transform-style: preserve-3d;
+  transform-origin: center;
+
+  will-change: transform, opacity;
+}
+
+.ff-hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3, 8, 17, 0.72),
+      rgba(3, 8, 17, 0.22)
+    ),
+    linear-gradient(
+      0deg,
+      rgba(3, 8, 17, 0.5),
+      transparent 65%
+    );
+
+  pointer-events: none;
+}
+
+.ff-hero-content {
+  position: relative;
+  z-index: 2;
+  transform-style: preserve-3d;
+}
+
+/* =====================================
+   PROMOTIONAL GALLERY
+===================================== */
+
+.ff-home-gallery {
+  perspective: 1200px;
+}
+
+.ff-home-gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+
+  transform-style: preserve-3d;
+  transform-origin: center;
+
+  will-change: transform, opacity;
+
+  background: #101820;
+}
+
+.ff-home-gallery-item img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+
+  transition:
+    transform 0.8s cubic-bezier(.2, .7, .2, 1);
+}
+
+.ff-home-gallery-item:hover img {
+  transform: scale(1.05);
+}
+
+/* CARD CAPTIONS */
+
+.ff-gallery-card-caption {
+  position: absolute;
+  inset: auto 0 0;
+
+  padding: 35px 20px 20px;
+
+  color: #fff;
+
+  background: linear-gradient(
+    transparent,
+    rgba(0, 0, 0, 0.8)
+  );
+}
+
+.ff-gallery-card-caption h3 {
+  margin: 0 0 6px;
+  font-size: 19px;
+}
+
+.ff-gallery-card-caption p {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 768px) {
+  .ff-hero-image-layer {
+    inset: 0;
+  }
+
+  .ff-home-gallery-item {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-home-gallery-item img {
+    transition: none;
+  }
+}
+
+/* ==========================================
+   FREEFLY CONTINUOUS IMAGE MOTION
+========================================== */
+
+.ff-home-gallery {
+  perspective: 1400px;
+}
+
+.ff-home-gallery-item {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 14px;
+  background: #101820;
+  transform-style: preserve-3d;
+  transition: transform 0.45s ease;
+  will-change: transform;
+  cursor: pointer;
+}
+
+/* Moving image layer */
+
+.ff-card-image-motion {
+  position: absolute;
+  inset: -12%;
+  overflow: hidden;
+  z-index: -1;
+
+  animation: freefly-image-drift
+    var(--motion-duration, 20s)
+    ease-in-out
+    var(--motion-delay, 0s)
+    infinite alternate;
+}
+
+.ff-card-image-motion img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Continuous cinematic movement */
+
+@keyframes freefly-image-drift {
+  0% {
+    transform: translate3d(-3%, 0, 0) scale(1.08);
+  }
+
+  50% {
+    transform: translate3d(1%, -2%, 0) scale(1.13);
+  }
+
+  100% {
+    transform: translate3d(3%, 1%, 0) scale(1.08);
+  }
+}
+
+/* Image readability */
+
+.ff-home-gallery-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.78) 0%,
+    rgba(0, 0, 0, 0.12) 55%,
+    transparent 100%
+  );
+}
+
+/* Card text */
+
+.ff-gallery-card-caption {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  padding: 28px 22px;
+  color: #fff;
+  pointer-events: none;
+}
+
+.ff-gallery-card-caption h3 {
+  margin: 0 0 6px;
+  font-size: 21px;
+}
+
+.ff-gallery-card-caption p {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .ff-card-image-motion {
+    animation-duration: 24s;
+  }
+
+  .ff-home-gallery-item {
+    transform: none !important;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-card-image-motion {
+    animation: none;
+  }
+
+  .ff-home-gallery-item {
+    transition: none;
+  }
+}
+
+/* =================================
+   CONTINUOUS HORIZONTAL GALLERY
+================================= */
+
+.ff-home-gallery {
+  width: 100%;
+  padding: 70px 0;
+  background: #000;
+  overflow: hidden;
+}
+
+.ff-home-gallery-heading {
+  max-width: 1600px;
+  margin: 0 auto 28px;
+  padding: 0 5%;
+}
+
+.ff-home-gallery-heading span {
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #aaa;
+}
+
+.ff-home-gallery-heading h2 {
+  font-size: 30px;
+  color: #fff;
+  margin: 12px 0;
+}
+
+.ff-home-gallery-heading p {
+  color: #ccc;
+  font-size: 17px;
+}
+
+/* Marquee container */
+
+.ff-home-gallery-marquee {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Moving track */
+
+.ff-home-gallery-track {
+  display: flex;
+  width: max-content;
+  animation: ff-gallery-scroll 35s linear infinite;
+  will-change: transform;
+}
+
+/* Two identical groups */
+
+.ff-home-gallery-group {
+  display: flex;
+  flex-shrink: 0;
+  gap: 26px;
+  padding-right: 26px;
+}
+
+/* Individual image cards */
+
+.ff-home-gallery-item {
+  position: relative;
+  flex: 0 0 clamp(280px, 32vw, 520px);
+  height: 370px;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #151515;
+  transform: none;
+}
+
+/* Images */
+
+.ff-home-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s ease;
+}
+
+/* Image hover */
+
+.ff-home-gallery-item:hover img {
+  transform: scale(1.08);
+}
+
+/* Bottom gradient */
+
+.ff-gallery-card-caption {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 45px 26px 25px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9),
+    rgba(0, 0, 0, 0)
+  );
+  color: white;
+}
+
+.ff-gallery-card-caption h3 {
+  font-size: 23px;
+  margin: 0 0 8px;
+}
+
+.ff-gallery-card-caption p {
+  font-size: 15px;
+  margin: 0;
+  color: #ddd;
+}
+
+/* Continuous movement */
+
+@keyframes ff-gallery-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause when hovering */
+
+.ff-home-gallery-marquee:hover
+.ff-home-gallery-track {
+  animation-play-state: paused;
+}
+
+/* Mobile responsive */
+
+@media (max-width: 768px) {
+  .ff-home-gallery {
+    padding: 45px 0;
+  }
+
+  .ff-home-gallery-heading h2 {
+    font-size: 25px;
+  }
+
+  .ff-home-gallery-heading p {
+    font-size: 14px;
+  }
+
+  .ff-home-gallery-group {
+    gap: 15px;
+    padding-right: 15px;
+  }
+
+  .ff-home-gallery-item {
+    flex: 0 0 280px;
+    height: 300px;
+  }
+
+  .ff-gallery-card-caption h3 {
+    font-size: 20px;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-home-gallery-track {
+    animation: none;
+  }
+}

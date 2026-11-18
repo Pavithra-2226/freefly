@@ -40,6 +40,7 @@ function AdminDashboard() {
     { name: "Packages", icon: "▣", path: "/admin/packages" },
     { name: "Enquiries", icon: "✉", path: "/admin/enquiries" },
     { name: "Offers", icon: "◇", path: "/admin/offers" },
+    {name: "Home Page", icon: "⌂", path: "/admin/homepage"},
   ];
 
   const fetchDashboardData = async () => {

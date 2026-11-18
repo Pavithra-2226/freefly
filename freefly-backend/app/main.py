@@ -10,6 +10,7 @@ from app.routes import packages
 from app.routes import enquiries
 from app.routes import admin_auth
 from app.routes import admin_destinations
+from app.routes import admin_homepage
 settings = get_settings()
 
 app = FastAPI(
@@ -74,4 +75,5 @@ app.include_router(enquiries.router)
 app.include_router(enquiries.admin_router)
 app.include_router(admin_auth.router)
 app.include_router(admin_destinations.router)
+app.include_router(admin_homepage.router)
 app.include_router(media.router)
