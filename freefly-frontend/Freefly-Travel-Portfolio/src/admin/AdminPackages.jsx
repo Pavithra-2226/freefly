@@ -24,6 +24,7 @@ function AdminPackages() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // RESET FORM
   const resetForm = () => {
@@ -84,6 +85,70 @@ function AdminPackages() {
       ...previous,
       [name]: value,
     }));
+  };
+
+  // CLOUDINARY IMAGE UPLOAD
+  const uploadImage = async (file) => {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Image size must be less than 10 MB.");
+      return;
+    }
+
+    const token = localStorage.getItem("admin_token");
+
+    if (!token) {
+      alert("Please login again.");
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/admin/media/upload",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: uploadData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Image upload failed.");
+      }
+
+      const imageUrl = data.image?.url;
+
+      if (!imageUrl) {
+        throw new Error("Image URL was not returned by the server.");
+      }
+
+      setFormData((previous) => ({
+        ...previous,
+        image: imageUrl,
+      }));
+
+      alert("Package image uploaded successfully!");
+    } catch (error) {
+      console.error("Package image upload error:", error);
+      alert(error.message);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   // EDIT PACKAGE
@@ -291,6 +356,11 @@ function AdminPackages() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (uploadingImage) {
+      alert("Please wait until the image finishes uploading.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("admin_token");
 
@@ -365,7 +435,13 @@ function AdminPackages() {
   );
 
   // REUSABLE ARRAY INPUT
-  const renderArrayItems = (items, updateItem, removeItem, placeholder, label) => (
+  const renderArrayItems = (
+    items,
+    updateItem,
+    removeItem,
+    placeholder,
+    label
+  ) => (
     <div className="ff-package-array">
       {items.length === 0 ? (
         <div className="ff-package-empty-section">
@@ -473,11 +549,6 @@ function AdminPackages() {
       {/* MAIN CONTENT */}
 
       <main className="ff-main">
-
-        {/* TOPBAR */}
-
-       
-
         <div className="ff-packages-content">
           <div className="ff-packages-inner">
 
@@ -587,13 +658,56 @@ function AdminPackages() {
                       </div>
                     </div>
 
+                    {/* CLOUDINARY PACKAGE IMAGE */}
+
                     <div className="ff-package-full-field">
-                      {renderInput(
-                        "Main Image URL",
-                        "image",
-                        "/travel/bali.jpg",
-                        true
-                      )}
+                      <div className="ff-package-field">
+                        <label>Package Main Image</label>
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingImage}
+                          onChange={(event) => {
+                            const file = event.target.files?.[0];
+
+                            if (file) {
+                              uploadImage(file);
+                            }
+
+                            event.target.value = "";
+                          }}
+                        />
+
+                        {uploadingImage && (
+                          <p>Uploading package image...</p>
+                        )}
+
+                        {formData.image && (
+                          <div style={{ marginTop: "12px" }}>
+                            <img
+                              src={formData.image}
+                              alt="Package preview"
+                              style={{
+                                width: "180px",
+                                height: "120px",
+                                objectFit: "cover",
+                                borderRadius: "10px",
+                                border: "1px solid #ddd",
+                              }}
+                            />
+
+                            <p
+                              style={{
+                                fontSize: "12px",
+                                wordBreak: "break-all",
+                              }}
+                            >
+                              Package image selected
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="ff-package-full-field">
@@ -698,7 +812,10 @@ function AdminPackages() {
                       </div>
                     ) : (
                       formData.itinerary.map((day, index) => (
-                        <div className="ff-package-itinerary-card" key={index}>
+                        <div
+                          className="ff-package-itinerary-card"
+                          key={index}
+                        >
                           <div className="ff-package-itinerary-heading">
                             <strong>Day {index + 1}</strong>
 
@@ -739,8 +856,13 @@ function AdminPackages() {
                     <button
                       type="submit"
                       className="ff-package-primary-btn"
+                      disabled={uploadingImage}
                     >
-                      {editingId ? "Update Package" : "Save Package"}
+                      {uploadingImage
+                        ? "Uploading Image..."
+                        : editingId
+                          ? "Update Package"
+                          : "Save Package"}
                     </button>
                   </div>
                 </form>

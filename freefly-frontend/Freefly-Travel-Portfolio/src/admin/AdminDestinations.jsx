@@ -2,129 +2,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const TAMIL_NADU_DESTINATIONS = [
-        {
-          name: "Ooty",
-          country: "India",
-          category: "Hill Station",
-          description: "Discover Ooty, the Queen of the Nilgiris, where rolling tea gardens, mist-covered mountains and peaceful lakes create a refreshing hill-station escape. Explore scenic viewpoints, beautifully maintained gardens and the charm of the Nilgiri Mountain Railway.",
-          image: "https://static.toiimg.com/thumb/msid-91006682%2Cwidth-748%2Cheight-499%2Cresizemode%3D4%2Cimgsize-166634/Ooty-Tamil-Nadu.jpg",
-          best_time_to_visit: "October to June",
-          places: [
-            { name: "Doddabetta Peak", image: "https://upload.wikimedia.org/wikipedia/commons/2/26/Ooty_-_Tea_plantation%2C_Doddabetta_Tamil_Nadu%2C_India.jpg", description: "Enjoy sweeping views of the Nilgiri hills from one of the region's best-known viewpoints." },
-            { name: "Ooty Lake", image: "https://ttdconline.com/assets/img/boathouse/ooty/list/ooty-bh-0.png", description: "Spend a relaxing afternoon beside the lake or enjoy a boat ride surrounded by green hills." },
-            { name: "Government Botanical Garden", image: "https://www.travel2ooty.com/pageimages/Botanical-Garden.jpg", description: "Explore colourful flower beds, lawns and tree-lined walking paths in this historic garden." }
-          ],
-          things_to_do: [
-            { name: "Ride the Nilgiri Mountain Railway", image: "https://images.herzindagi.info/image/2023/Dec/ooty-the-archies.jpg", description: "Take a memorable toy-train journey through tunnels, bridges and beautiful mountain scenery." },
-            { name: "Explore the Tea Gardens", image: "https://travel2ooty.s3.ap-south-1.amazonaws.com/tea-garden-hero.webp", description: "Walk through lush tea estates and enjoy the cool mountain air and plantation views." },
-            { name: "Enjoy Lake Boating", image: "https://upload.wikimedia.org/wikipedia/commons/3/37/Honeymoon_Boathouse_ooty.jpg", description: "Enjoy a peaceful boating experience at the popular Ooty Lake." }
-          ],
-          gallery: ["https://upload.wikimedia.org/wikipedia/commons/2/26/Ooty_-_Tea_plantation%2C_Doddabetta_Tamil_Nadu%2C_India.jpg", "https://ttdconline.com/assets/img/boathouse/ooty/list/ooty-bh-0.png", "https://www.travel2ooty.com/pageimages/Botanical-Garden.jpg"],
-          status: "active"
-        },
-        {
-          name: "Kodaikanal",
-          country: "India",
-          category: "Hill Station",
-          description: "Escape to Kodaikanal, the Princess of Hill Stations, known for its cool climate, wooded slopes, scenic valleys and the star-shaped Kodai Lake. Enjoy peaceful nature walks, viewpoints and waterfalls in the Palani Hills.",
-          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20Lake%2C%20Tamil%20Nadu.jpg",
-          best_time_to_visit: "April to June and September to October",
-          places: [
-            { name: "Kodaikanal Lake", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20Lake%2C%20Tamil%20Nadu.jpg", description: "Walk or cycle around the star-shaped lake, or enjoy boating in the heart of Kodaikanal." },
-            { name: "Coaker's Walk", image: "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Kodaikanal%20lake%2C%20Tamil%20Nadu%20India.jpg", description: "Take a scenic stroll along this mountain pathway with wide views over the valleys." },
-            { name: "Pillar Rocks", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20hill%20and%20lake.jpeg", description: "See the striking granite pillars rising above the green valley and forest landscape." }
-          ],
-          things_to_do: [
-            { name: "Go Boating", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20Lake%2C%20Tamil%20Nadu.jpg", description: "Enjoy a relaxing boat ride and admire the hills around Kodai Lake." },
-            { name: "Walk Through Pine Forest", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20hill%20and%20lake.jpeg", description: "Explore the tall pine trees and peaceful forest paths that make Kodaikanal special." },
-            { name: "Visit Scenic Viewpoints", image: "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Kodaikanal%20lake%2C%20Tamil%20Nadu%20India.jpg", description: "Stop at viewpoints for misty valley scenery and memorable photographs." }
-          ],
-          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20Lake%2C%20Tamil%20Nadu.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Kodaikanal%20lake%2C%20Tamil%20Nadu%20India.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Kodaikanal%20hill%20and%20lake.jpeg"],
-          status: "active"
-        },
-        {
-          name: "Madurai",
-          country: "India",
-          category: "Heritage",
-          description: "Experience Madurai, one of Tamil Nadu's historic cultural centres. The city is celebrated for the magnificent Meenakshi Amman Temple, lively traditional markets, distinctive architecture and its rich food and festival culture.",
-          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg",
-          best_time_to_visit: "October to March",
-          places: [
-            { name: "Meenakshi Amman Temple", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", description: "Admire the famous temple complex, its colourful towers and detailed Dravidian architecture." },
-            { name: "Thirumalai Nayakkar Palace", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Madurai%20Meenakshi%20Amman%20Temple.JPG", description: "Discover the grand pillars and historic architecture of this 17th-century palace." },
-            { name: "Gandhi Memorial Museum", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", description: "Learn about India's freedom movement through exhibits and historical displays." }
-          ],
-          things_to_do: [
-            { name: "Explore the Temple Streets", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", description: "Walk around the temple streets and browse traditional shops and local markets." },
-            { name: "Taste Madurai Cuisine", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Madurai%20Meenakshi%20Amman%20Temple.JPG", description: "Try local favourites and experience the city's lively food culture." },
-            { name: "Discover Heritage Architecture", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", description: "Spend time exploring the city's historic buildings and distinctive temple architecture." }
-          ],
-          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Meenakshi%20Amman%20Temple%2C%20Madurai.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Madurai%20Meenakshi%20Amman%20Temple.JPG"],
-          status: "active"
-        },
-        {
-          name: "Rameswaram",
-          country: "India",
-          category: "Temple",
-          description: "Visit Rameswaram, a beautiful island destination known for its sacred Ramanathaswamy Temple, long temple corridors, coastal landscapes and the iconic Pamban Bridge. It offers a memorable blend of spirituality, history and seaside scenery.",
-          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20pamban%20bridge.jpg",
-          best_time_to_visit: "October to April",
-          places: [
-            { name: "Ramanathaswamy Temple", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20pamban%20bridge.jpg", description: "Visit the renowned temple, known for its long pillared corridors and sacred significance." },
-            { name: "Pamban Bridge", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20bridge%20Pamban%20bridge.jpg", description: "See the famous bridge connecting the island region with mainland Tamil Nadu." },
-            { name: "Dhanushkodi", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Pamban%20Bridge%2C%20Rameswaram.jpg", description: "Explore the dramatic coastal landscape and the remains of the old settlement at the island's tip." }
-          ],
-          things_to_do: [
-            { name: "Explore the Temple Corridors", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20pamban%20bridge.jpg", description: "Experience the architecture and atmosphere of the famous Ramanathaswamy Temple." },
-            { name: "Visit Dhanushkodi Beach", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Pamban%20Bridge%2C%20Rameswaram.jpg", description: "Enjoy the sea views and unique coastal setting at Dhanushkodi." },
-            { name: "View Pamban Bridge", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20bridge%20Pamban%20bridge.jpg", description: "Take in the striking sea-bridge views and photograph this famous landmark." }
-          ],
-          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20pamban%20bridge.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Rameswaram%20bridge%20Pamban%20bridge.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Pamban%20Bridge%2C%20Rameswaram.jpg"],
-          status: "active"
-        },
-        {
-          name: "Kanyakumari",
-          country: "India",
-          category: "Beach",
-          description: "Discover Kanyakumari at the southern tip of mainland India, where the Arabian Sea, Bay of Bengal and Indian Ocean meet. The destination is loved for its sunrise and sunset views, Vivekananda Rock Memorial and coastal atmosphere.",
-          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari.jpg",
-          best_time_to_visit: "October to March",
-          places: [
-            { name: "Vivekananda Rock Memorial", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari.jpg", description: "Take a ferry to the memorial on the rock and enjoy the panoramic ocean setting." },
-            { name: "Thiruvalluvar Statue", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu%2C%20India.jpg", description: "See the monumental statue honouring the celebrated Tamil poet and philosopher Thiruvalluvar." },
-            { name: "Kanyakumari Beach", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu.jpg", description: "Enjoy the coastal views and the famous sunrise and sunset atmosphere." }
-          ],
-          things_to_do: [
-            { name: "Watch the Sunrise", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari.jpg", description: "Start the day by watching the sun rise over the ocean horizon." },
-            { name: "Take a Ferry Ride", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu%2C%20India.jpg", description: "Travel by ferry to visit the offshore memorial and enjoy the sea views." },
-            { name: "Explore the Seafront", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu.jpg", description: "Walk along the waterfront and enjoy the distinctive southern coastal scenery." }
-          ],
-          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu%2C%20India.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Vivekananda%20Rock%20Memorial%2C%20Kanyakumari%2C%20Tamil%20Nadu.jpg"],
-          status: "active"
-        },
-        {
-          name: "Mahabalipuram",
-          country: "India",
-          category: "Heritage",
-          description: "Explore Mahabalipuram, a coastal heritage town famous for its Pallava-era rock-cut monuments, carved stone temples and Shore Temple overlooking the Bay of Bengal. It is an excellent destination for history, architecture and seaside visits.",
-          image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%2C%20Mahabalipuram%2C%20Tamil%20Nadu.jpg",
-          best_time_to_visit: "November to February",
-          places: [
-            { name: "Shore Temple", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%2C%20Mahabalipuram%2C%20Tamil%20Nadu.jpg", description: "Visit the landmark granite temple standing beside the Bay of Bengal." },
-            { name: "Pancha Rathas", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%20at%20Mahabalipuram%20Tamilnadu.jpg", description: "Discover the remarkable group of monolithic rock-cut monuments carved from single stones." },
-            { name: "Arjuna's Penance", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mahabalipuram%20Shore%20Temple.jpg", description: "Admire the enormous open-air rock relief filled with detailed sculptural scenes." }
-          ],
-          things_to_do: [
-            { name: "Explore the Shore Temple", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%2C%20Mahabalipuram%2C%20Tamil%20Nadu.jpg", description: "Walk around the historic temple complex and enjoy its coastal setting." },
-            { name: "Discover the Stone Carvings", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%20at%20Mahabalipuram%20Tamilnadu.jpg", description: "Look closely at the detailed carvings and ancient rock-cut architecture." },
-            { name: "Relax by the Beach", image: "https://commons.wikimedia.org/wiki/Special:FilePath/Mahabalipuram%20Shore%20Temple.jpg", description: "Spend some time along the coast after exploring the heritage monuments." }
-          ],
-          gallery: ["https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%2C%20Mahabalipuram%2C%20Tamil%20Nadu.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Shore%20Temple%20at%20Mahabalipuram%20Tamilnadu.jpg", "https://commons.wikimedia.org/wiki/Special:FilePath/Mahabalipuram%20Shore%20Temple.jpg"],
-          status: "active"
-        }
-      ];
-
 function AdminDestinations() {
   const navigate = useNavigate();
 
@@ -132,10 +9,11 @@ function AdminDestinations() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [uploadingImages, setUploadingImages] = useState(0);
 
   const initialFormData = {
     name: "",
-    country: "India",
+    country: "",
     category: "",
     description: "",
     image: "",
@@ -158,12 +36,161 @@ function AdminDestinations() {
   };
 
   // =====================================================
+  // CLOUDINARY IMAGE UPLOAD
+  // =====================================================
+
+  const uploadImage = async (file, onSuccess) => {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Image size must be less than 10 MB.");
+      return;
+    }
+
+    const token = localStorage.getItem("admin_token");
+
+    if (!token) {
+      alert("Please login again.");
+      return;
+    }
+
+    try {
+      setUploadingImages((count) => count + 1);
+
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/admin/media/upload",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: uploadData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Image upload failed."
+        );
+      }
+
+      // Supports common response formats.
+      const imageUrl =
+        data.image?.url ||
+        data.url ||
+        data.secure_url ||
+        data.data?.url;
+
+      if (!imageUrl) {
+        console.error("Unexpected upload response:", data);
+        throw new Error(
+          "Image URL was not returned by the server."
+        );
+      }
+
+      onSuccess(imageUrl);
+
+      alert("Image uploaded successfully!");
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      alert(error.message || "Unable to upload image.");
+    } finally {
+      setUploadingImages((count) => Math.max(0, count - 1));
+    }
+  };
+
+  // =====================================================
+  // REUSABLE IMAGE UPLOADER
+  // =====================================================
+
+  const renderImageUploader = (label, imageUrl, onUpload, onUrlChange) => (
+    <div className="ff-field">
+      <label>{label}</label>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+
+          if (file) {
+            uploadImage(file, onUpload);
+          }
+
+          // Allows selecting the same file again.
+          event.target.value = "";
+        }}
+      />
+
+      <small
+        style={{
+          display: "block",
+          marginTop: "6px",
+          color: "#64748b",
+        }}
+      >
+        Select an image from your computer. Maximum size: 10 MB.
+      </small>
+
+      {/* Keep URL editing available for existing images */}
+      <input
+        type="text"
+        value={imageUrl || ""}
+        onChange={(event) => onUrlChange(event.target.value)}
+        placeholder="Image URL will appear here after upload"
+        style={{ marginTop: "12px" }}
+      />
+
+      {imageUrl && (
+        <div style={{ marginTop: "12px" }}>
+          <img
+            src={imageUrl}
+            alt={label}
+            style={{
+              width: "150px",
+              height: "100px",
+              objectFit: "cover",
+              borderRadius: "10px",
+              border: "1px solid #ddd",
+              display: "block",
+            }}
+            onError={(event) => {
+              event.currentTarget.style.display = "none";
+            }}
+          />
+
+          <small
+            style={{
+              display: "block",
+              marginTop: "6px",
+              color: "#16a34a",
+            }}
+          >
+            Image URL available
+          </small>
+        </div>
+      )}
+    </div>
+  );
+
+  // =====================================================
   // GET DESTINATIONS
   // =====================================================
 
   const fetchDestinations = async () => {
     try {
       setLoading(true);
+
       const token = localStorage.getItem("admin_token");
 
       if (!token) {
@@ -175,90 +202,23 @@ function AdminDestinations() {
         "http://127.0.0.1:8000/api/admin/destinations",
         {
           method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || "Failed to load destinations");
+        throw new Error(
+          data.detail || "Failed to load destinations"
+        );
       }
 
       setDestinations(data);
     } catch (error) {
       console.error("Destination error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Replace all existing destination records with the six curated Tamil Nadu destinations.
-  const handleReplaceWithTamilNadu = async () => {
-    const confirmed = window.confirm(
-      "This will permanently delete ALL existing destinations and replace them with Ooty, Kodaikanal, Madurai, Rameswaram, Kanyakumari and Mahabalipuram. Continue?"
-    );
-    if (!confirmed) return;
-
-    const token = localStorage.getItem("admin_token");
-    if (!token) {
-      alert("Please login again.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const currentResponse = await fetch(
-        "http://127.0.0.1:8000/api/admin/destinations",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const currentItems = await currentResponse.json();
-
-      if (!currentResponse.ok) {
-        throw new Error(currentItems.detail || "Could not load existing destinations.");
-      }
-
-      for (const item of currentItems) {
-        const deleteResponse = await fetch(
-          `http://127.0.0.1:8000/api/admin/destinations/${item.id}`,
-          {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        if (!deleteResponse.ok) {
-          const errorData = await deleteResponse.json();
-          throw new Error(errorData.detail || `Could not delete ${item.name}.`);
-        }
-      }
-
-      const createdItems = [];
-      for (const destination of TAMIL_NADU_DESTINATIONS) {
-        const createResponse = await fetch(
-          "http://127.0.0.1:8000/api/admin/destinations",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(destination),
-          }
-        );
-        const created = await createResponse.json();
-        if (!createResponse.ok) {
-          throw new Error(created.detail || `Could not create ${destination.name}.`);
-        }
-        createdItems.push(created);
-      }
-
-      setDestinations(createdItems);
-      alert("Successfully replaced your destination list with six Tamil Nadu destinations.");
-    } catch (error) {
-      console.error("Destination reset error:", error);
-      alert(error.message || "Could not replace destinations.");
-      await fetchDestinations();
     } finally {
       setLoading(false);
     }
@@ -295,8 +255,16 @@ function AdminDestinations() {
       description: destination.description || "",
       image: destination.image || "",
       best_time_to_visit: destination.best_time_to_visit || "",
-      places: destination.places || [],
-      things_to_do: destination.things_to_do || [],
+      places: (destination.places || []).map((place) => ({
+        name: place.name || "",
+        image: place.image || "",
+        description: place.description || "",
+      })),
+      things_to_do: (destination.things_to_do || []).map((activity) => ({
+        name: activity.name || "",
+        image: activity.image || "",
+        description: activity.description || "",
+      })),
       gallery: destination.gallery || [],
       status: destination.status || "active",
     });
@@ -369,9 +337,7 @@ function AdminDestinations() {
       }
 
       const newStatus =
-        destination.status === "active"
-          ? "inactive"
-          : "active";
+        destination.status === "active" ? "inactive" : "active";
 
       const response = await fetch(
         `http://127.0.0.1:8000/api/admin/destinations/${destination.id}`,
@@ -532,6 +498,45 @@ function AdminDestinations() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (uploadingImages > 0) {
+      alert("Please wait until all images finish uploading.");
+      return;
+    }
+
+    if (!formData.image.trim()) {
+      alert("Please upload or enter a main destination image.");
+      return;
+    }
+
+    const incompletePlace = formData.places.some(
+      (place) =>
+        !place.name.trim() ||
+        !place.image.trim() ||
+        !place.description.trim()
+    );
+
+    if (incompletePlace) {
+      alert("Please complete all place details and upload their images.");
+      return;
+    }
+
+    const incompleteActivity = formData.things_to_do.some(
+      (activity) =>
+        !activity.name.trim() ||
+        !activity.image.trim() ||
+        !activity.description.trim()
+    );
+
+    if (incompleteActivity) {
+      alert("Please complete all activity details and upload their images.");
+      return;
+    }
+
+    if (formData.gallery.some((image) => !image.trim())) {
+      alert("Please upload or enter all gallery images.");
+      return;
+    }
 
     try {
       const token = localStorage.getItem("admin_token");
@@ -730,11 +735,6 @@ function AdminDestinations() {
       {/* MAIN CONTENT */}
 
       <main className="ff-main">
-
-        {/* TOPBAR */}
-
-       
-
         <div className="ff-destinations-content">
           <div className="ff-destinations-inner">
 
@@ -754,31 +754,20 @@ function AdminDestinations() {
                 </p>
               </div>
 
-              <div className="ff-destination-heading-actions" style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                <button
-                  type="button"
-                  className="ff-outline-btn"
-                  onClick={handleReplaceWithTamilNadu}
-                  disabled={loading}
-                  title="Deletes all existing destinations and loads the six prepared Tamil Nadu destinations"
-                >
-                  Replace All with 6 Tamil Nadu Places
-                </button>
-                <button
-                  type="button"
-                  className="ff-primary-btn"
-                  onClick={() => {
-                    if (showForm) {
-                      handleCloseForm();
-                    } else {
-                      resetForm();
-                      setShowForm(true);
-                    }
-                  }}
-                >
-                  {showForm ? "✕ Close Form" : "+ Add Destination"}
-                </button>
-              </div>
+              <button
+                type="button"
+                className="ff-primary-btn"
+                onClick={() => {
+                  if (showForm) {
+                    handleCloseForm();
+                  } else {
+                    resetForm();
+                    setShowForm(true);
+                  }
+                }}
+              >
+                {showForm ? "✕ Close Form" : "+ Add Destination"}
+              </button>
             </div>
 
             {/* ADD / EDIT FORM */}
@@ -821,14 +810,14 @@ function AdminDestinations() {
                       {renderInput(
                         "Destination Name",
                         "name",
-                        "Example: Ooty",
+                        "Example: Paris",
                         true
                       )}
 
                       {renderInput(
                         "Country",
                         "country",
-                        "Example: India",
+                        "Example: France",
                         true
                       )}
 
@@ -841,13 +830,11 @@ function AdminDestinations() {
                           required
                         >
                           <option value="">Select Category</option>
-                          <option value="Hill Station">Hill Station</option>
+                          <option value="International">International</option>
+                          <option value="India">India</option>
                           <option value="Beach">Beach</option>
-                          <option value="Heritage">Heritage</option>
-                          <option value="Temple">Temple</option>
-                          <option value="Nature">Nature</option>
                           <option value="Adventure">Adventure</option>
-                          <option value="Wildlife">Wildlife</option>
+                          <option value="Honeymoon">Honeymoon</option>
                         </select>
                       </div>
 
@@ -865,11 +852,19 @@ function AdminDestinations() {
                     </div>
 
                     <div className="ff-form-full-field">
-                      {renderInput(
-                        "Main Image URL",
-                        "image",
-                        "https://example.com/destination.jpg",
-                        true
+                      {renderImageUploader(
+                        "Main Destination Image",
+                        formData.image,
+                        (url) =>
+                          setFormData((previous) => ({
+                            ...previous,
+                            image: url,
+                          })),
+                        (value) =>
+                          setFormData((previous) => ({
+                            ...previous,
+                            image: value,
+                          }))
                       )}
                     </div>
 
@@ -960,22 +955,12 @@ function AdminDestinations() {
                               />
                             </div>
 
-                            <div className="ff-field">
-                              <label>Image URL</label>
-                              <input
-                                type="text"
-                                value={place.image}
-                                onChange={(event) =>
-                                  updatePlace(
-                                    index,
-                                    "image",
-                                    event.target.value
-                                  )
-                                }
-                                placeholder="https://example.com/place.jpg"
-                                required
-                              />
-                            </div>
+                            {renderImageUploader(
+                              "Place Image",
+                              place.image,
+                              (url) => updatePlace(index, "image", url),
+                              (value) => updatePlace(index, "image", value)
+                            )}
                           </div>
 
                           <div className="ff-form-full-field">
@@ -1059,22 +1044,12 @@ function AdminDestinations() {
                               />
                             </div>
 
-                            <div className="ff-field">
-                              <label>Image URL</label>
-                              <input
-                                type="text"
-                                value={activity.image}
-                                onChange={(event) =>
-                                  updateActivity(
-                                    index,
-                                    "image",
-                                    event.target.value
-                                  )
-                                }
-                                placeholder="https://example.com/activity.jpg"
-                                required
-                              />
-                            </div>
+                            {renderImageUploader(
+                              "Activity Image",
+                              activity.image,
+                              (url) => updateActivity(index, "image", url),
+                              (value) => updateActivity(index, "image", value)
+                            )}
                           </div>
 
                           <div className="ff-form-full-field">
@@ -1128,21 +1103,12 @@ function AdminDestinations() {
                     ) : (
                       formData.gallery.map((image, index) => (
                         <div className="ff-gallery-input-row" key={index}>
-                          <div className="ff-field">
-                            <label>Gallery Image {index + 1}</label>
-                            <input
-                              type="text"
-                              value={image}
-                              onChange={(event) =>
-                                updateGalleryImage(
-                                  index,
-                                  event.target.value
-                                )
-                              }
-                              placeholder="https://example.com/gallery.jpg"
-                              required
-                            />
-                          </div>
+                          {renderImageUploader(
+                            `Gallery Image ${index + 1}`,
+                            image,
+                            (url) => updateGalleryImage(index, url),
+                            (value) => updateGalleryImage(index, value)
+                          )}
 
                           <button
                             type="button"
@@ -1163,6 +1129,7 @@ function AdminDestinations() {
                       type="button"
                       className="ff-cancel-btn"
                       onClick={handleCloseForm}
+                      disabled={uploadingImages > 0}
                     >
                       Cancel
                     </button>
@@ -1170,10 +1137,13 @@ function AdminDestinations() {
                     <button
                       type="submit"
                       className="ff-primary-btn"
+                      disabled={uploadingImages > 0}
                     >
-                      {editingId
-                        ? "Update Destination"
-                        : "Save Destination"}
+                      {uploadingImages > 0
+                        ? "Uploading Images..."
+                        : editingId
+                          ? "Update Destination"
+                          : "Save Destination"}
                     </button>
                   </div>
                 </form>
@@ -1185,9 +1155,7 @@ function AdminDestinations() {
             <div className="ff-destination-list-heading">
               <div>
                 <h2>All Destinations</h2>
-                <p>
-                  Your destination collection
-                </p>
+                <p>Your destination collection</p>
               </div>
 
               <span className="ff-destination-count">
@@ -1209,7 +1177,10 @@ function AdminDestinations() {
                 <button
                   type="button"
                   className="ff-primary-btn"
-                  onClick={() => setShowForm(true)}
+                  onClick={() => {
+                    resetForm();
+                    setShowForm(true);
+                  }}
                 >
                   + Add Destination
                 </button>
