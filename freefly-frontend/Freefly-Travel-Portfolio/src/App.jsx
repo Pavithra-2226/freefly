@@ -20,7 +20,7 @@ import AdminEnquiries from "./admin/AdminEnquiries";
 import AdminHomePage from "./admin/AdminHomePage";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-
+import { ArrowDown, Compass, Sparkles } from "lucide-react";
 gsap.registerPlugin(ScrollTrigger);
 import {
   BrowserRouter,
@@ -1204,62 +1204,190 @@ function Destinations() {
     </main>
   )
 }
-
 function Packages() {
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('/api/packages')
+    fetch("/api/packages")
       .then((response) => {
         if (!response.ok) {
-          throw new Error(`Request failed with status ${response.status}`)
+          throw new Error(`Request failed with status ${response.status}`);
         }
-
-        return response.json()
+        return response.json();
       })
       .then((data) => {
-        setItems(data)
-        setLoading(false)
+        setItems(data);
+        setLoading(false);
       })
       .catch(() => {
-        setError('We could not load packages right now. Please try again shortly.')
-        setLoading(false)
-      })
-  }, [])
+        setError(
+          "We could not load packages right now. Please try again shortly."
+        );
+        setLoading(false);
+      });
+  }, []);
 
   return (
-    <main>
+    <main className="premium-packages-page">
 
-      <PageHero
-        eyebrow="Travel, considered"
-        title="Packages with room to breathe."
-        copy="A strong starting point for your next escape, with the flexibility to make it your own."
-        image={packagesHero}
-      />
+      {/* CINEMATIC HERO */}
+      <section className="premium-packages-hero">
 
-      <section className="section">
-        <div className="container">
+        <div className="premium-packages-hero-image">
+          <img src={packagesHero} alt="Explore beautiful destinations" />
+        </div>
 
-          {loading && <p>Loading packages…</p>}
+        <div className="premium-packages-hero-overlay" />
 
-          {error && <p className="form-error">{error}</p>}
+        <div className="packages-hero-decoration">
+          <span className="hero-orbit orbit-one" />
+          <span className="hero-orbit orbit-two" />
+        </div>
 
-          {!loading && !error && items.length === 0 && (
-            <p>No packages available yet.</p>
-          )}
+        <div className="premium-packages-hero-content">
 
-          {!loading && !error && items.length > 0 && (
-            <PackageCards items={items} />
+          <div className="packages-hero-eyebrow">
+            <Sparkles size={14} />
+            <span>TRAVEL BEYOND THE ORDINARY</span>
+          </div>
+
+          <h1>
+            The world is
+            <br />
+            <span>waiting for you.</span>
+          </h1>
+
+          <p>
+            Extraordinary places. Unforgettable experiences.
+            Your next great journey begins here.
+          </p>
+
+          <div className="packages-hero-actions">
+            <a href="#explore-packages" className="packages-explore-btn">
+              Explore journeys
+              <ArrowDown size={17} />
+            </a>
+
+            <span className="packages-hero-caption">
+              DISCOVER YOUR NEXT DESTINATION
+            </span>
+          </div>
+
+        </div>
+
+        <div className="packages-hero-bottom">
+          <span>FREEFLY TOURISM & TRAVELS</span>
+          <span>EXPLORE WITHOUT LIMITS</span>
+        </div>
+
+      </section>
+
+      {/* PACKAGE SHOWCASE */}
+      <section
+        className="premium-packages-showcase"
+        id="explore-packages"
+      >
+
+        <div className="packages-showcase-heading">
+
+          <div>
+            <span className="packages-section-eyebrow">
+              <Compass size={14} />
+              CURATED EXPERIENCES
+            </span>
+
+            <h2>
+              Find your next
+              <span> escape.</span>
+            </h2>
+
+            <p>
+              Handpicked journeys designed to make every moment memorable.
+            </p>
+          </div>
+
+          {!loading && !error && (
+            <div className="packages-count">
+              <strong>{String(items.length).padStart(2, "0")}</strong>
+              <span>JOURNEYS TO EXPLORE</span>
+            </div>
           )}
 
         </div>
+
+        {loading && (
+          <div className="packages-state">
+            <div className="packages-loader" />
+            <p>Discovering your next destination...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="packages-state packages-error">
+            <p>{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && items.length === 0 && (
+          <div className="packages-state">
+            <p>No packages available yet.</p>
+          </div>
+        )}
+
+       {!loading && !error && items.length > 0 && (
+  <div className="packages-card-stage">
+
+    {items.map((pkg, index) => (
+      <article
+        className="destination-card"
+        key={pkg._id || pkg.id || index}
+        style={{ backgroundImage: `url(${pkg.image})` }}
+      >
+        <div className="destination-card-overlay" />
+
+        <div className="destination-card-orbit">
+          <span className="orbit-dot orbit-dot-one" />
+          <span className="orbit-dot orbit-dot-two" />
+          <span className="orbit-dot orbit-dot-three" />
+        </div>
+
+        <div className="destination-card-content">
+
+          <span className="destination-card-number">
+            {index + 1}/{items.length}
+          </span>
+
+          <span className="destination-card-location">
+            {pkg.destination}
+          </span>
+
+          <h3>{pkg.title}</h3>
+
+          <p>{pkg.description}</p>
+
+          <Link
+            to={`/packages/${pkg._id || pkg.id}`}
+            className="destination-discover-btn"
+          >
+            DISCOVER MORE
+          </Link>
+
+        </div>
+      </article>
+    ))}
+
+  </div>
+)}
+        
+
       </section>
 
     </main>
-  )
+  );
 }
+
 
 function Services() {
   return (

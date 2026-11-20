@@ -12,7 +12,9 @@ const initialFormData = {
   tag: "",
   status: "active",
   inclusions: [],
+  inclusion_images: [],
   exclusions: [],
+  exclusion_images: [],
   itinerary: [],
 };
 
@@ -31,7 +33,9 @@ function AdminPackages() {
     setFormData({
       ...initialFormData,
       inclusions: [],
+      inclusion_images: [],
       exclusions: [],
+      exclusion_images: [],
       itinerary: [],
     });
     setEditingId(null);
@@ -87,64 +91,56 @@ function AdminPackages() {
     }));
   };
 
-  // CLOUDINARY IMAGE UPLOAD
-  const uploadImage = async (file) => {
-    if (!file) return;
+  // COMMON IMAGE UPLOAD (uses the existing backend media endpoint)
+  const uploadImageToServer = async (file) => {
+    if (!file) return "";
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image.");
-      return;
+      throw new Error("Please select a valid image.");
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image size must be less than 10 MB.");
-      return;
+      throw new Error("Image size must be less than 10 MB.");
     }
 
     const token = localStorage.getItem("admin_token");
+    if (!token) throw new Error("Please login again.");
 
-    if (!token) {
-      alert("Please login again.");
-      return;
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    const response = await fetch(
+      "http://127.0.0.1:8000/api/admin/media/upload",
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: uploadData,
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.detail || "Image upload failed.");
     }
+
+    const imageUrl = data.image?.url;
+    if (!imageUrl) {
+      throw new Error("Image URL was not returned by the server.");
+    }
+
+    return imageUrl;
+  };
+
+  // Reusable upload handler for any package image field
+  const handleImageUpload = async (file, onChange) => {
+    if (!file) return;
 
     try {
       setUploadingImage(true);
-
-      const uploadData = new FormData();
-      uploadData.append("file", file);
-
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/admin/media/upload",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: uploadData,
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || "Image upload failed.");
-      }
-
-      const imageUrl = data.image?.url;
-
-      if (!imageUrl) {
-        throw new Error("Image URL was not returned by the server.");
-      }
-
-      setFormData((previous) => ({
-        ...previous,
-        image: imageUrl,
-      }));
-
-      alert("Package image uploaded successfully!");
+      const imageUrl = await uploadImageToServer(file);
+      onChange(imageUrl);
     } catch (error) {
-      console.error("Package image upload error:", error);
+      console.error("Image upload error:", error);
       alert(error.message);
     } finally {
       setUploadingImage(false);
@@ -165,8 +161,19 @@ function AdminPackages() {
       tag: packageItem.tag || "",
       status: packageItem.status || "active",
       inclusions: packageItem.inclusions || [],
+      inclusion_images: packageItem.inclusion_images || [],
       exclusions: packageItem.exclusions || [],
-      itinerary: packageItem.itinerary || [],
+      exclusion_images: packageItem.exclusion_images || [],
+      itinerary: (packageItem.itinerary || []).map((day, index) =>
+        typeof day === "string"
+          ? { day: index + 1, title: `Day ${index + 1}`, description: day, image: "" }
+          : {
+              day: day.day || index + 1,
+              title: day.title || `Day ${index + 1}`,
+              description: day.description || "",
+              image: day.image || "",
+            }
+      ),
     });
 
     setShowForm(true);
@@ -327,28 +334,71 @@ function AdminPackages() {
   const addItineraryDay = () => {
     setFormData((previous) => ({
       ...previous,
-      itinerary: [...previous.itinerary, ""],
+      itinerary: [
+        ...previous.itinerary,
+        {
+          day: previous.itinerary.length + 1,
+          title: "",
+          description: "",
+          image: "",
+        },
+      ],
     }));
   };
 
-  const updateItineraryDay = (index, value) => {
-    setFormData((previous) => {
-      const updated = [...previous.itinerary];
-      updated[index] = value;
-
-      return {
-        ...previous,
-        itinerary: updated,
-      };
-    });
+  const updateItineraryDay = (index, field, value) => {
+    setFormData((previous) => ({
+      ...previous,
+      itinerary: previous.itinerary.map((day, itemIndex) =>
+        itemIndex === index ? { ...day, [field]: value } : day
+      ),
+    }));
   };
 
   const removeItineraryDay = (index) => {
     setFormData((previous) => ({
       ...previous,
-      itinerary: previous.itinerary.filter(
-        (_, itemIndex) => itemIndex !== index
+      itinerary: previous.itinerary
+        .filter((_, itemIndex) => itemIndex !== index)
+        .map((day, itemIndex) => ({ ...day, day: itemIndex + 1 })),
+    }));
+  };
+
+  // INCLUSION / EXCLUSION IMAGE ARRAYS (maximum two images each)
+  const addSectionImageSlot = (field) => {
+    setFormData((previous) => {
+      if (previous[field].length >= 2) return previous;
+      return { ...previous, [field]: [...previous[field], ""] };
+    });
+  };
+
+  const updateSectionImageUrl = (field, index, value) => {
+    setFormData((previous) => ({
+      ...previous,
+      [field]: previous[field].map((url, itemIndex) =>
+        itemIndex === index ? value : url
       ),
+    }));
+  };
+
+  const uploadSectionImage = async (file, field, index) => {
+    if (!file) return;
+    try {
+      setUploadingImage(true);
+      const imageUrl = await uploadImageToServer(file);
+      updateSectionImageUrl(field, index, imageUrl);
+    } catch (error) {
+      console.error("Section image upload error:", error);
+      alert(error.message);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const removeSectionImage = (field, index) => {
+    setFormData((previous) => ({
+      ...previous,
+      [field]: previous[field].filter((_, itemIndex) => itemIndex !== index),
     }));
   };
 
@@ -358,6 +408,30 @@ function AdminPackages() {
 
     if (uploadingImage) {
       alert("Please wait until the image finishes uploading.");
+      return;
+    }
+
+    if (!formData.image.trim()) {
+      alert("Please upload or enter the main package image URL.");
+      return;
+    }
+
+    const cleanedFormData = {
+      ...formData,
+      inclusions: formData.inclusions.map((item) => item.trim()).filter(Boolean),
+      exclusions: formData.exclusions.map((item) => item.trim()).filter(Boolean),
+      inclusion_images: formData.inclusion_images.filter((url) => url.trim()),
+      exclusion_images: formData.exclusion_images.filter((url) => url.trim()),
+      itinerary: formData.itinerary.map((day, index) => ({
+        day: index + 1,
+        title: day.title.trim(),
+        description: day.description.trim(),
+        image: day.image.trim(),
+      })),
+    };
+
+    if (cleanedFormData.itinerary.some((day) => !day.title || !day.description || !day.image)) {
+      alert("Please complete the title, description, and image for every itinerary day.");
       return;
     }
 
@@ -381,7 +455,7 @@ function AdminPackages() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(cleanedFormData),
       });
 
       const data = await response.json();
@@ -467,6 +541,113 @@ function AdminPackages() {
           </div>
         ))
       )}
+    </div>
+  );
+
+  // REUSABLE IMAGE FIELD: upload from device OR paste an image URL
+  const renderImagePicker = (label, value, onChange) => (
+    <div className="ff-package-image-picker">
+      <label>{label}</label>
+      <div className="ff-package-image-options">
+        <div>
+          <small>Upload from device</small>
+          <input
+            type="file"
+            accept="image/*"
+            disabled={uploadingImage}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) handleImageUpload(file, onChange);
+              event.target.value = "";
+            }}
+          />
+        </div>
+        <div>
+          <small>Or paste image URL</small>
+          <input
+            type="text"
+            value={value || ""}
+            onChange={(event) => onChange(event.target.value)}
+            placeholder="https://example.com/image.jpg"
+          />
+        </div>
+      </div>
+      {value && (
+        <div className="ff-package-image-preview">
+          <img src={value} alt={`${label} preview`} />
+          <button
+            type="button"
+            className="ff-package-image-remove"
+            aria-label={`Remove ${label}`}
+            title="Remove image"
+            onClick={() => onChange("")}
+          >
+            ×
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderSectionImageArray = (field, label) => (
+    <div className="ff-package-section-image-manager">
+      <div className="ff-package-section-image-title">
+        <strong>{label} Images</strong>
+        <span>{formData[field].length}/2 images</span>
+      </div>
+
+      {formData[field].map((imageUrl, index) => (
+        <div className="ff-package-section-image-row" key={`${field}-${index}`}>
+          <div className="ff-package-section-image-preview">
+            {imageUrl ? (
+              <img src={imageUrl} alt={`${label} ${index + 1}`} />
+            ) : (
+              <span>Image preview</span>
+            )}
+            <button
+              type="button"
+              className="ff-package-image-remove"
+              aria-label={`Remove ${label} image ${index + 1}`}
+              title="Remove image"
+              onClick={() => removeSectionImage(field, index)}
+            >
+              ×
+            </button>
+          </div>
+
+          <div className="ff-package-section-image-inputs">
+            <label>Upload from device</label>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploadingImage}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) uploadSectionImage(file, field, index);
+                event.target.value = "";
+              }}
+            />
+            <label>Or paste image URL</label>
+            <input
+              type="text"
+              value={imageUrl}
+              placeholder="https://example.com/image.jpg"
+              onChange={(event) => updateSectionImageUrl(field, index, event.target.value)}
+            />
+          </div>
+        </div>
+      ))}
+
+      {formData[field].length < 2 && (
+        <button
+          type="button"
+          className="ff-package-outline-btn"
+          onClick={() => addSectionImageSlot(field)}
+        >
+          + Add {label} Image
+        </button>
+      )}
+      {uploadingImage && <small>Uploading image...</small>}
     </div>
   );
 
@@ -658,56 +839,13 @@ function AdminPackages() {
                       </div>
                     </div>
 
-                    {/* CLOUDINARY PACKAGE IMAGE */}
-
+                    {/* PACKAGE MAIN IMAGE */}
                     <div className="ff-package-full-field">
-                      <div className="ff-package-field">
-                        <label>Package Main Image</label>
-
-                        <input
-                          type="file"
-                          accept="image/*"
-                          disabled={uploadingImage}
-                          onChange={(event) => {
-                            const file = event.target.files?.[0];
-
-                            if (file) {
-                              uploadImage(file);
-                            }
-
-                            event.target.value = "";
-                          }}
-                        />
-
-                        {uploadingImage && (
-                          <p>Uploading package image...</p>
-                        )}
-
-                        {formData.image && (
-                          <div style={{ marginTop: "12px" }}>
-                            <img
-                              src={formData.image}
-                              alt="Package preview"
-                              style={{
-                                width: "180px",
-                                height: "120px",
-                                objectFit: "cover",
-                                borderRadius: "10px",
-                                border: "1px solid #ddd",
-                              }}
-                            />
-
-                            <p
-                              style={{
-                                fontSize: "12px",
-                                wordBreak: "break-all",
-                              }}
-                            >
-                              Package image selected
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                      {renderImagePicker(
+                        "Package Main Image",
+                        formData.image,
+                        (value) => setFormData((previous) => ({ ...previous, image: value }))
+                      )}
                     </div>
 
                     <div className="ff-package-full-field">
@@ -753,6 +891,8 @@ function AdminPackages() {
                       "Example: Daily breakfast",
                       "Inclusions"
                     )}
+
+                    {renderSectionImageArray("inclusion_images", "Inclusion")}
                   </div>
 
                   {/* EXCLUSIONS */}
@@ -783,6 +923,8 @@ function AdminPackages() {
                       "Example: Personal expenses",
                       "Exclusions"
                     )}
+
+                    {renderSectionImageArray("exclusion_images", "Exclusion")}
                   </div>
 
                   {/* ITINERARY */}
@@ -812,31 +954,47 @@ function AdminPackages() {
                       </div>
                     ) : (
                       formData.itinerary.map((day, index) => (
-                        <div
-                          className="ff-package-itinerary-card"
-                          key={index}
-                        >
+                        <div className="ff-package-itinerary-card" key={index}>
                           <div className="ff-package-itinerary-heading">
                             <strong>Day {index + 1}</strong>
-
                             <button
                               type="button"
                               className="ff-package-remove-btn"
                               onClick={() => removeItineraryDay(index)}
                             >
-                              Remove
+                              Remove Day
                             </button>
                           </div>
 
-                          <textarea
-                            value={day}
-                            onChange={(event) =>
-                              updateItineraryDay(index, event.target.value)
-                            }
-                            placeholder={`Day ${index + 1} - Arrival, hotel check-in and sightseeing`}
-                            rows="3"
-                            required
-                          />
+                          <div className="ff-package-form-grid">
+                            <div className="ff-package-field">
+                              <label>Day Title</label>
+                              <input
+                                type="text"
+                                value={day.title}
+                                onChange={(event) => updateItineraryDay(index, "title", event.target.value)}
+                                placeholder={`Day ${index + 1}: Arrival and sightseeing`}
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="ff-package-field">
+                            <label>Day Description</label>
+                            <textarea
+                              value={day.description}
+                              onChange={(event) => updateItineraryDay(index, "description", event.target.value)}
+                              placeholder="Describe the activities for this day..."
+                              rows="3"
+                              required
+                            />
+                          </div>
+
+                          {renderImagePicker(
+                            `Day ${index + 1} Image`,
+                            day.image,
+                            (value) => updateItineraryDay(index, "image", value)
+                          )}
                         </div>
                       ))
                     )}

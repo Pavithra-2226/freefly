@@ -38,7 +38,7 @@ def create_package(payload: PackageCreate):
 
     now = datetime.now(timezone.utc)
 
-    package_data = payload.model_dump()
+    package_data = payload.model_dump(mode="json")
     package_data["created_at"] = now
     package_data["updated_at"] = now
 
@@ -55,7 +55,7 @@ def update_package(package_id: str, payload: PackageUpdate):
     if not ObjectId.is_valid(package_id):
         return None
 
-    update_data = payload.model_dump(exclude_unset=True)
+    update_data = payload.model_dump(exclude_unset=True,mode="json")
 
     if not update_data:
         package = collection.find_one({"_id": ObjectId(package_id)})

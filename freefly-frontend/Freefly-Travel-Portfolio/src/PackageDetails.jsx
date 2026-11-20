@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -8,6 +9,9 @@ import {
   CalendarDays,
   MapPin,
   Clock,
+  ChevronDown,
+  Compass,
+  Sparkles,
 } from "lucide-react";
 
 function PackageDetails() {
@@ -16,6 +20,7 @@ function PackageDetails() {
   const [pkg, setPkg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeDay, setActiveDay] = useState(0);
 
   useEffect(() => {
     const fetchPackage = async () => {
@@ -33,6 +38,7 @@ function PackageDetails() {
 
         const data = await response.json();
         setPkg(data);
+        setActiveDay(0);
       } catch (err) {
         console.error(err);
         setError("We could not load this package right now.");
@@ -46,9 +52,10 @@ function PackageDetails() {
 
   if (loading) {
     return (
-      <main className="package-details-page">
-        <div className="package-details-loading">
-          <p>Loading package...</p>
+      <main className="pd-state">
+        <div className="pd-state-content">
+          <Compass size={35} />
+          <p>Preparing your journey...</p>
         </div>
       </main>
     );
@@ -56,12 +63,11 @@ function PackageDetails() {
 
   if (error || !pkg) {
     return (
-      <main className="package-details-page">
-        <div className="package-details-error">
+      <main className="pd-state">
+        <div className="pd-state-content">
           <h1>Package not found</h1>
           <p>{error}</p>
-
-          <Link to="/packages" className="package-back-button">
+          <Link to="/packages" className="pd-back-button">
             <ArrowLeft size={17} />
             Back to packages
           </Link>
@@ -71,250 +77,295 @@ function PackageDetails() {
   }
 
   return (
-    <main className="package-details-page">
+    <main className="pd-page">
 
       {/* HERO */}
-      <section className="package-details-hero">
+      <section className="pd-hero">
         <img
+          className="pd-hero-image"
           src={pkg.image}
           alt={`${pkg.title} travel package`}
         />
 
-        <div className="package-details-overlay" />
+        <div className="pd-hero-overlay" />
 
-        <div className="package-details-hero-content">
-
-          <Link
-            to="/packages"
-            className="package-details-back"
-          >
+        <div className="pd-hero-content">
+          <Link to="/packages" className="pd-back-link">
             <ArrowLeft size={17} />
-            All packages
+            <span>BACK TO PACKAGES</span>
           </Link>
 
-          {pkg.tag && (
-            <span className="package-details-tag">
-              {pkg.tag}
-            </span>
-          )}
+          <div className="pd-hero-bottom">
+            <div className="pd-hero-copy">
+              {pkg.tag && (
+                <span className="pd-tag">
+                  <Sparkles size={13} />
+                  {pkg.tag}
+                </span>
+              )}
 
-          <p className="package-details-eyebrow">
-            {pkg.destination}
-          </p>
+              <p className="pd-eyebrow">
+                DISCOVER {pkg.destination}
+              </p>
 
-          <h1>{pkg.title}</h1>
+              <h1>{pkg.title}</h1>
 
-          <p className="package-details-hero-description">
-            {pkg.description}
-          </p>
+              <p className="pd-hero-description">
+                {pkg.description}
+              </p>
+            </div>
 
+            <div className="pd-hero-number">
+              <span>YOUR NEXT</span>
+              <strong>ADVENTURE</strong>
+              <span>STARTS HERE</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="pd-hero-bottom-line">
+          <span>CURATED EXPERIENCES</span>
+          <span>UNFORGETTABLE MEMORIES</span>
         </div>
       </section>
 
+      {/* SUMMARY */}
+      <section className="pd-summary">
+        <div className="pd-summary-inner">
 
-      {/* PACKAGE SUMMARY */}
-      <section className="package-details-summary">
-        <div className="package-details-summary-inner">
-
-          <div className="package-summary-item">
-            <MapPin size={21} />
+          <div className="pd-summary-item">
+            <div className="pd-summary-icon">
+              <MapPin />
+            </div>
             <div>
-              <span>Destination</span>
+              <span>DESTINATION</span>
               <strong>{pkg.destination}</strong>
             </div>
           </div>
 
-          <div className="package-summary-item">
-            <Clock size={21} />
+          <div className="pd-summary-item">
+            <div className="pd-summary-icon">
+              <Clock />
+            </div>
             <div>
-              <span>Duration</span>
+              <span>DURATION</span>
               <strong>{pkg.duration}</strong>
             </div>
           </div>
 
-          <div className="package-summary-item">
-            <CalendarDays size={21} />
+          <div className="pd-summary-item">
+            <div className="pd-summary-icon">
+              <CalendarDays />
+            </div>
             <div>
-              <span>Package type</span>
+              <span>PACKAGE TYPE</span>
               <strong>{pkg.tag || "Travel package"}</strong>
             </div>
           </div>
 
-          <div className="package-summary-price">
-            <span>Starting from</span>
+          <div className="pd-summary-price">
+            <span>STARTING FROM</span>
             <strong>{pkg.price}</strong>
           </div>
 
         </div>
       </section>
 
-
-      {/* MAIN CONTENT */}
-      <section className="package-details-content">
-
-        <div className="package-details-main">
-
-          {/* DESCRIPTION */}
-          <section className="package-section">
-            <span className="package-section-label">
-              THE EXPERIENCE
-            </span>
-
+      {/* EXPERIENCE */}
+      <section className="pd-overview">
+        <div className="pd-section-heading">
+          <div>
+            <span className="pd-section-label">01 / THE EXPERIENCE</span>
             <h2>
-              A journey worth
-              <em> remembering.</em>
+              More than a trip.
+              <em> A story to live.</em>
             </h2>
+          </div>
 
-            <p className="package-description">
-              {pkg.description}
-            </p>
-          </section>
-
-
-          {/* ITINERARY */}
-          {pkg.itinerary && pkg.itinerary.length > 0 && (
-            <section className="package-section">
-
-              <span className="package-section-label">
-                YOUR JOURNEY
-              </span>
-
-              <h2>
-                Day by day.
-              </h2>
-
-              <div className="package-itinerary">
-
-                {pkg.itinerary.map((day, index) => (
-                  <div
-                    className="itinerary-item"
-                    key={index}
-                  >
-                    <div className="itinerary-number">
-                      {String(index + 1).padStart(2, "0")}
-                    </div>
-
-                    <div className="itinerary-content">
-                      <span>
-                        DAY {index + 1}
-                      </span>
-
-                      <p>{day}</p>
-                    </div>
-                  </div>
-                ))}
-
-              </div>
-            </section>
-          )}
-
-
-          {/* INCLUSIONS / EXCLUSIONS */}
-          <section className="package-section">
-
-            <span className="package-section-label">
-              WHAT'S INCLUDED
-            </span>
-
-            <h2>
-              Everything you need.
-            </h2>
-
-            <div className="package-inclusion-grid">
-
-              {/* INCLUSIONS */}
-              <div className="package-list-card included">
-
-                <div className="package-list-heading">
-                  <div className="package-list-icon">
-                    <Check size={18} />
-                  </div>
-
-                  <h3>Inclusions</h3>
-                </div>
-
-                {pkg.inclusions && pkg.inclusions.length > 0 ? (
-                  <ul>
-                    {pkg.inclusions.map((item, index) => (
-                      <li key={index}>
-                        <Check size={15} />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="package-empty-list">
-                    No inclusions added yet.
-                  </p>
-                )}
-
-              </div>
-
-
-              {/* EXCLUSIONS */}
-              <div className="package-list-card excluded">
-
-                <div className="package-list-heading">
-                  <div className="package-list-icon">
-                    <X size={18} />
-                  </div>
-
-                  <h3>Exclusions</h3>
-                </div>
-
-                {pkg.exclusions && pkg.exclusions.length > 0 ? (
-                  <ul>
-                    {pkg.exclusions.map((item, index) => (
-                      <li key={index}>
-                        <X size={15} />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="package-empty-list">
-                    No exclusions added yet.
-                  </p>
-                )}
-
-              </div>
-
-            </div>
-
-          </section>
-
-
-          {/* CTA */}
-          <section className="package-details-cta">
-
-            <div>
-              <span className="package-section-label">
-                READY TO GO?
-              </span>
-
-              <h2>
-                Let's plan your
-                <em> journey.</em>
-              </h2>
-
-              <p>
-                Tell us what you have in mind and our team
-                will help you turn this package into your perfect trip.
-              </p>
-            </div>
-
-            <Link
-              to="/contact"
-              className="package-enquire-button"
-            >
-              Enquire about this package
-              <ArrowRight size={18} />
-            </Link>
-
-          </section>
-
+          <span className="pd-heading-decoration">EXPLORE</span>
         </div>
 
+        <div className="pd-overview-content">
+          <div className="pd-overview-image">
+            <img src={pkg.image} alt={pkg.destination} />
+            <span className="pd-image-caption">
+              YOUR DESTINATION AWAITS
+            </span>
+          </div>
+
+          <div className="pd-overview-text">
+            <span className="pd-small-label">THE JOURNEY BEGINS</span>
+            <h3>Discover every moment.</h3>
+            <p>{pkg.description}</p>
+
+            <div className="pd-overview-decoration">
+              <Compass size={22} />
+              <span>Made for curious travellers</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+     
+{/* ITINERARY */}
+
+{pkg.itinerary && pkg.itinerary.length > 0 && (
+  <section className="package-section pd-itinerary-section">
+    <div className="pd-itinerary-heading">
+      <span>YOUR JOURNEY</span>
+      <h2>Day-by-Day Itinerary</h2>
+      <p>
+        Explore every moment of your travel experience.
+      </p>
+    </div>
+
+    <div className="pd-itinerary-list">
+      {pkg.itinerary.map((day, index) => {
+        const isLegacy = typeof day === "string";
+
+        const dayTitle = isLegacy
+          ? `Day ${index + 1}`
+          : day.title || `Day ${index + 1}`;
+
+        const dayDescription = isLegacy
+          ? day
+          : day.description || "";
+
+        const dayImage = isLegacy ? "" : day.image || "";
+
+        return (
+          <div
+            className={`pd-itinerary-row ${
+              index % 2 !== 0 ? "reverse" : ""
+            }`}
+            key={index}
+          >
+            {dayImage && (
+              <div className="pd-itinerary-image">
+                <img
+                  src={dayImage}
+                  alt={dayTitle}
+                  loading="lazy"
+                />
+              </div>
+            )}
+
+            <div
+              className={`pd-itinerary-content ${
+                !dayImage ? "full-width" : ""
+              }`}
+            >
+              <span className="pd-itinerary-day">
+                DAY {String(index + 1).padStart(2, "0")}
+              </span>
+
+              <h3>{dayTitle}</h3>
+
+              <p>{dayDescription}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </section>
+)}
+
+
+    
+{/* PACKAGE INCLUSIONS */}
+{pkg.inclusions?.length > 0 && (
+  <section className="pd-feature-section pd-inclusion-section">
+    <div className="pd-feature-inner">
+      <div className="pd-feature-images">
+        {pkg.inclusion_images?.slice(0, 2).map((image, index) => (
+          <div className="pd-feature-image" key={index}>
+            <img
+              src={image}
+              alt={`Package inclusion ${index + 1}`}
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="pd-feature-content">
+        <span className="pd-feature-label">YOUR EXPERIENCE</span>
+        <h2>What's Included</h2>
+        <p className="pd-feature-description">
+          Everything we've included to make your journey comfortable
+          and memorable.
+        </p>
+
+        <ul>
+          {pkg.inclusions.map((item, index) => (
+            <li key={index}>
+              <span className="pd-feature-icon">✓</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+)}
+
+{/* PACKAGE EXCLUSIONS */}
+{pkg.exclusions?.length > 0 && (
+  <section className="pd-feature-section pd-exclusion-section">
+    <div className="pd-feature-inner">
+      <div className="pd-feature-images">
+        {pkg.exclusion_images?.slice(0, 2).map((image, index) => (
+          <div className="pd-feature-image" key={index}>
+            <img
+              src={image}
+              alt={`Package exclusion ${index + 1}`}
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="pd-feature-content">
+        <span className="pd-feature-label">PLEASE NOTE</span>
+        <h2>What's Excluded</h2>
+        <p className="pd-feature-description">
+          A few things to keep in mind while planning your journey.
+        </p>
+
+        <ul>
+          {pkg.exclusions.map((item, index) => (
+            <li key={index}>
+              <span className="pd-feature-icon">×</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+)}
+
+
+      {/* CTA */}
+      <section className="pd-cta">
+        <div className="pd-cta-decoration">LET'S TRAVEL</div>
+
+        <div className="pd-cta-content">
+          <span className="pd-section-label">YOUR NEXT CHAPTER</span>
+          <h2>
+            The world is waiting.
+            <em> Are you ready?</em>
+          </h2>
+          <p>
+            Let our team help you plan an unforgettable experience
+            with this package.
+          </p>
+
+          <Link to="/contact" className="pd-enquire-button">
+            Enquire about this package
+            <ArrowRight size={18} />
+          </Link>
+        </div>
       </section>
 
     </main>
